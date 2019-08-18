@@ -11,60 +11,71 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            string filePathName = @"D:\C#\testpic.png";
+            string filePathName = @"D:\C#\test2rows5colum.png";
+
             int stepPicX = 140;
             int stepPicY = 140;
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
+
             Bitmap picfile = new Bitmap(filePathName);
             Bitmap bitmap = new Bitmap(picfile);
 
             int count = 0;
             int allcount = 0;
-            //int step = 140;
-            int countOfPic = 0;
-            for (int stepY = 0; stepY < bitmap.Height;)
+            int countOfComparedPictures = 0;
+            int xCoordinateOfComparedPictures = 0;
+            int yCoordinateOfComparedPictures = 0;
+            int xCoordinateOfComparePictures = 0;
+            int yCoordinateOfComparePictures = 0;
+
+            for (int xComparedPicture = 0; xComparedPicture < bitmap.Width; xComparedPicture += stepPicX)
             {
-                for (int stepX = stepPicX; stepX < bitmap.Width;)
+                //for (int yNextPictures = 0; yNextPictures < bitmap.Height; yNextPictures += stepPicY)
+                //{
+                for (int xNextPictures = xComparedPicture + stepPicX; xNextPictures < bitmap.Width; xNextPictures += stepPicX)
                 {
-                    for (int i = 0; i < 140; i++)
+                    if (xNextPictures == xComparedPicture) continue;
+
+                    if (xComparedPicture + stepPicX < bitmap.Width)
                     {
-                        for (int j = 0; j < 140; j++)
+                        for (int xCoordinate = 0; xCoordinate < stepPicX; xCoordinate++)
                         {
-                            if (bitmap.GetPixel(i, j).R == bitmap.GetPixel(i + stepX, j + stepY).R &&
-                                bitmap.GetPixel(i, j).G == bitmap.GetPixel(i + stepX, j + stepY).G &&
-                                bitmap.GetPixel(i, j).B == bitmap.GetPixel(i + stepX, j + stepY).B)
-                                count++;
-                            //else
-                            //{
-                            //    Console.WriteLine($"x = {i}, y = {j} ");
-                            //    Console.WriteLine($"R={bitmap.GetPixel(i, j).R}, " +
-                            //        $"G={bitmap.GetPixel(i, j).G}, B={bitmap.GetPixel(i, j).B}, A={bitmap.GetPixel(i, j).A}");
-                            //    Console.WriteLine($"R={bitmap.GetPixel(i + 280, j).R}, " +
-                            //        $"G={bitmap.GetPixel(i + 280, j).G}, B={bitmap.GetPixel(i + 280, j).B}, A={bitmap.GetPixel(i + 280, j).A}");
-
-                            //}
-                            allcount++;
+                            for (int yCoorfinate = 0; yCoorfinate < 140; yCoorfinate++)
+                            {
+                                if (bitmap.GetPixel(xCoordinate, yCoorfinate).R == bitmap.GetPixel(xCoordinate + xNextPictures, yCoorfinate).R &&
+                                    bitmap.GetPixel(xCoordinate, yCoorfinate).G == bitmap.GetPixel(xCoordinate + xNextPictures, yCoorfinate).G &&
+                                    bitmap.GetPixel(xCoordinate, yCoorfinate).B == bitmap.GetPixel(xCoordinate + xNextPictures, yCoorfinate).B)
+                                    count++;
+                                allcount++;
+                                yCoordinateOfComparedPictures = yCoorfinate + 1 - 140;
+                                yCoordinateOfComparePictures = yCoorfinate + 1 - 140;
+                            }
+                            xCoordinateOfComparedPictures = xCoordinate + xNextPictures - stepPicX + 1;
+                            xCoordinateOfComparePictures = xCoordinate + 1 - stepPicX;
                         }
-                    }
-                    countOfPic++;
-                    if ((double)count / allcount > 0.9)
-                    {
-                        Console.WriteLine($"Pic# {countOfPic}");
-                        Console.WriteLine($"stepPic = {stepX}");
-                        //Console.WriteLine($"equal pixels = {count}");
-                        //Console.WriteLine($"all count = {allcount}");
-                        Console.WriteLine($"precision = {(double)count / allcount * 100}%");
-                        Console.WriteLine();
-                    }
+                        countOfComparedPictures++;
 
-                    count = 0; allcount = 0; stepX += stepPicX;
+                        if ((double)count / allcount > 0.1)
+                        {
+                            Console.WriteLine($"X coordinate of compare Pic {xComparedPicture}");
+                            Console.WriteLine($"Y coordinate of compare Pic {yCoordinateOfComparePictures}");
+                            Console.WriteLine($"X coordinate of compared Pic {xNextPictures}");
+                            Console.WriteLine($"Y coordinate of compared Pic {yCoordinateOfComparedPictures}");
+                            Console.WriteLine($"precision = {(double)count / allcount * 100}%");
+                            Console.WriteLine($"xNext = {xNextPictures}");
+                            Console.WriteLine();
+                        }
+
+                        count = 0; allcount = 0;
+
+                    }
+                    //}
                 }
 
-                stepY += stepPicY;
             }
 
-            Console.WriteLine($"work with {countOfPic} pics");
+            Console.WriteLine($"work with {countOfComparedPictures} pics");
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
             Console.WriteLine((double)elapsedMs / 1000);
