@@ -35,7 +35,9 @@ namespace ConsoleApp1
                         for (int xNextPictures = 0; xNextPictures < bitmap.Width; xNextPictures += stepPicX)
                         {
                             if ((xNextPictures == xComparedPicture && yNextPictures == yComparePicture) ||
-                                (xNextPictures < xComparedPicture && yNextPictures < yComparePicture)) continue;
+                                (xNextPictures < xComparedPicture && yNextPictures < yComparePicture) ||
+                                (xNextPictures < xComparedPicture && yNextPictures == yComparePicture) || 
+                                (yNextPictures < yComparePicture)) continue;
 
                             if (xComparedPicture < bitmap.Width)
                             {
