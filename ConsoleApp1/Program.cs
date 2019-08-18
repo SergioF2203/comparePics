@@ -12,7 +12,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            string filePathName = @"D:\C#\test2rows5colum.png";
+            string filePathName = @"D:\C#\test2rows.png";
             string filePathNameOutput = @"D:\C#\testColor.png";
 
             int stepPicX = 140;
@@ -55,7 +55,7 @@ namespace ConsoleApp1
                                 }
                                 countOfComparedPictures++;
 
-                                if ((double)count / allcount > 0.7)
+                                if ((double)count / allcount > 0.8 && (double)count / allcount < 0.82)
                                 {
                                     Console.WriteLine($"X coordinate of compare Pic {xComparedPicture}");
                                     Console.WriteLine($"Y coordinate of compare Pic {yComparePicture}");
@@ -64,6 +64,10 @@ namespace ConsoleApp1
                                     Console.WriteLine($"precision = {(double)count / allcount * 100}%");
                                     Console.WriteLine($"xNext = {xNextPictures}");
                                     Console.WriteLine();
+
+                                    //Random randomColor = new Random();
+                                    //Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
+                                    //ColoredDublicate(bitmap, xNextPictures, yNextPictures, stepPicX, color);
                                 }
                                 count = 0; allcount = 0;
                             }
@@ -72,7 +76,7 @@ namespace ConsoleApp1
                 }
             }
 
-            ColoredDublicate(bitmap, 280, 140, stepPicX);
+            //ColoredDublicate(bitmap, 560, 140, stepPicX);
 
             if (File.Exists(filePathNameOutput))
                 File.Delete(filePathNameOutput);
@@ -85,28 +89,30 @@ namespace ConsoleApp1
             Console.WriteLine((double)elapsedMs / 1000);
         }
 
-        private static void ColoredDublicate(Bitmap bitmap, int leftUpperCornerX, int leftUpperCornerY, int sideSizeRect)
+        private static void ColoredDublicate(Bitmap bitmap, int leftUpperCornerX, int leftUpperCornerY, int sideSizeRect, Color color)
         {
-            Random randomColor = new Random();
-
-            Color colorBtm = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
             for (int i = leftUpperCornerX; i < leftUpperCornerX + sideSizeRect; i++)
             {
                 //Upper horizontal line
-                bitmap.SetPixel(i, leftUpperCornerY, colorBtm);
-                bitmap.SetPixel(i, leftUpperCornerY - 1, colorBtm);
+                bitmap.SetPixel(i, leftUpperCornerY, color);
+                bitmap.SetPixel(i, leftUpperCornerY + 1, color);
+                bitmap.SetPixel(i, leftUpperCornerY + 2, color);
+
                 //Right vertical line
-                bitmap.SetPixel(leftUpperCornerX + sideSizeRect - 1, i + leftUpperCornerY - leftUpperCornerX, colorBtm);
-                bitmap.SetPixel(leftUpperCornerX + sideSizeRect - 2, i + leftUpperCornerY - leftUpperCornerX, colorBtm);
+                bitmap.SetPixel(leftUpperCornerX + sideSizeRect - 1, i + leftUpperCornerY - leftUpperCornerX, color);
+                bitmap.SetPixel(leftUpperCornerX + sideSizeRect - 2, i + leftUpperCornerY - leftUpperCornerX, color);
+                bitmap.SetPixel(leftUpperCornerX + sideSizeRect - 3, i + leftUpperCornerY - leftUpperCornerX, color);
+
                 //Bottom horizontal line
-                bitmap.SetPixel(i, leftUpperCornerY + sideSizeRect - 1, colorBtm);
-                bitmap.SetPixel(i, leftUpperCornerY + sideSizeRect - 2, colorBtm);
+                bitmap.SetPixel(i, leftUpperCornerY + sideSizeRect - 1, color);
+                bitmap.SetPixel(i, leftUpperCornerY + sideSizeRect - 2, color);
+                bitmap.SetPixel(i, leftUpperCornerY + sideSizeRect - 3, color);
+
                 //Left vertical line
-                bitmap.SetPixel(leftUpperCornerX, i + leftUpperCornerY - leftUpperCornerX, colorBtm);
-                bitmap.SetPixel(leftUpperCornerX + 1, i + leftUpperCornerY - leftUpperCornerX, colorBtm);
-
+                bitmap.SetPixel(leftUpperCornerX, i + leftUpperCornerY - leftUpperCornerX, color);
+                bitmap.SetPixel(leftUpperCornerX + 1, i + leftUpperCornerY - leftUpperCornerX, color);
+                bitmap.SetPixel(leftUpperCornerX + 2, i + leftUpperCornerY - leftUpperCornerX, color);
             }
-
         }
     }
 }
