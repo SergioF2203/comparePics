@@ -114,5 +114,21 @@ namespace ConsoleApp1
                 bitmap.SetPixel(leftUpperCornerX + 2, i + leftUpperCornerY - leftUpperCornerX, color);
             }
         }
+
+        private static List<bool> GetHash(Bitmap bitmap)
+        {
+            List<bool> IResult = new List<bool>();
+            Bitmap bitmapMin = new Bitmap(bitmap, new Size(16, 16));
+            for(int y = 0; y<bitmapMin.Height; y++)
+            {
+                for(int x = 0; x < bitmapMin.Width; x++)
+                {
+                    IResult.Add(bitmapMin.GetPixel(x, y).GetBrightness() < 0.5f);
+                }
+            }
+            return IResult;
+        }
+
+
     }
 }
