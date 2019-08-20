@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -12,11 +13,14 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            string filePathName = @"D:\C#\test2rows.png";
-            string filePathNameOutput = @"D:\C#\testColor.png";
+            string filePathName = ConfigurationManager.AppSettings.Get("pathFileName");
+            string filePathNameOutput = ConfigurationManager.AppSettings.Get("pathOutputFileName");
 
             int stepPicX = 140;
             int stepPicY = 140;
+
+            int sideSizeCompressedPicture = 16;
+            float precisionIndex = 0.5f;
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -42,46 +46,71 @@ namespace ConsoleApp1
 
                             if (xComparedPicture < bitmap.Width)
                             {
-                                for (int xCoordinate = xComparedPicture; xCoordinate < xComparedPicture + stepPicX; xCoordinate++)
-                                {
-                                    for (int yCoordinate = yComparePicture; yCoordinate < yComparePicture + stepPicY; yCoordinate++)
-                                    {
-                                        if (bitmap.GetPixel(xCoordinate, yCoordinate).R == bitmap.GetPixel(xNextPictures + xCoordinate - xComparedPicture, yCoordinate + yNextPictures - yComparePicture).R &&
-                                            bitmap.GetPixel(xCoordinate, yCoordinate).G == bitmap.GetPixel(xNextPictures + xCoordinate - xComparedPicture, yCoordinate + yNextPictures - yComparePicture).G &&
-                                            bitmap.GetPixel(xCoordinate, yCoordinate).B == bitmap.GetPixel(xNextPictures + xCoordinate - xComparedPicture, yCoordinate + yNextPictures - yComparePicture).B)
-                                            count++;
-                                        allcount++;
-                                    }
-                                }
-                                countOfComparedPictures++;
+                                //compare with custom Hash function
+                                Rectangle cloneRect = new Rectangle(xComparedPicture, yComparePicture, stepPicX, stepPicY);
+                                Rectangle cloneCompareRect = new Rectangle(xNextPictures, yNextPictures, stepPicX, stepPicY);
+                                System.Drawing.Imaging.PixelFormat format = bitmap.PixelFormat;
+                                Bitmap cloneBitmap = bitmap.Clone(cloneRect, format);
+                                Bitmap cloneCompareBitmap = bitmap.Clone(cloneCompareRect, format);
 
-                                if ((double)count / allcount > 0.8 && (double)count / allcount < 0.82)
+                                List<bool> iHash1 = GetHash(cloneBitmap, sideSizeCompressedPicture, precisionIndex);
+                                List<bool> iHash2 = GetHash(cloneCompareBitmap, sideSizeCompressedPicture, precisionIndex);
+
+                                cloneBitmap.Dispose();
+                                cloneCompareBitmap.Dispose();
+
+                                int equalElemets = iHash1.Zip(iHash2, (i, j) => i == j).Count(eq => eq);
+                                countOfComparedPictures++;
+                                if ((double)equalElemets / Math.Pow(sideSizeCompressedPicture, 2) > 0.99)
                                 {
                                     Console.WriteLine($"X coordinate of compare Pic {xComparedPicture}");
                                     Console.WriteLine($"Y coordinate of compare Pic {yComparePicture}");
                                     Console.WriteLine($"X coordinate of compared Pic {xNextPictures}");
                                     Console.WriteLine($"Y coordinate of compared Pic {yNextPictures}");
-                                    Console.WriteLine($"precision = {(double)count / allcount * 100}%");
-                                    Console.WriteLine($"xNext = {xNextPictures}");
+                                    Console.WriteLine($"precision (equal elements) = {(double)equalElemets / Math.Pow(sideSizeCompressedPicture, 2) * 100}");
                                     Console.WriteLine();
-
-                                    //Random randomColor = new Random();
-                                    //Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
-                                    //ColoredDublicate(bitmap, xNextPictures, yNextPictures, stepPicX, color);
                                 }
-                                count = 0; allcount = 0;
+
+
+                                //compare pic with another ones
+                                //for (int xCoordinate = xComparedPicture; xCoordinate < xComparedPicture + stepPicX; xCoordinate++)
+                                //{
+                                //    for (int yCoordinate = yComparePicture; yCoordinate < yComparePicture + stepPicY; yCoordinate++)
+                                //    {
+                                //        if (bitmap.GetPixel(xCoordinate, yCoordinate).R == bitmap.GetPixel(xNextPictures + xCoordinate - xComparedPicture, yCoordinate + yNextPictures - yComparePicture).R &&
+                                //            bitmap.GetPixel(xCoordinate, yCoordinate).G == bitmap.GetPixel(xNextPictures + xCoordinate - xComparedPicture, yCoordinate + yNextPictures - yComparePicture).G &&
+                                //            bitmap.GetPixel(xCoordinate, yCoordinate).B == bitmap.GetPixel(xNextPictures + xCoordinate - xComparedPicture, yCoordinate + yNextPictures - yComparePicture).B)
+                                //            count++;
+                                //        allcount++;
+                                //    }
+                                //}
+                                //countOfComparedPictures++;
+
+                                //if ((double)count / allcount > 0.8 && (double)count / allcount < 0.82)
+                                //{
+                                //    Console.WriteLine($"X coordinate of compare Pic {xComparedPicture}");
+                                //    Console.WriteLine($"Y coordinate of compare Pic {yComparePicture}");
+                                //    Console.WriteLine($"X coordinate of compared Pic {xNextPictures}");
+                                //    Console.WriteLine($"Y coordinate of compared Pic {yNextPictures}");
+                                //    Console.WriteLine($"precision = {(double)count / allcount * 100}%");
+                                //    Console.WriteLine($"xNext = {xNextPictures}");
+                                //    Console.WriteLine();
+
+                                //    //Random randomColor = new Random();
+                                //    //Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
+                                //    //ColoredDublicate(bitmap, xNextPictures, yNextPictures, stepPicX, color);
+                                //}
+                                //count = 0; allcount = 0;
                             }
                         }
                     }
                 }
             }
 
-            //ColoredDublicate(bitmap, 560, 140, stepPicX);
+            //if (File.Exists(filePathNameOutput))
+            //    File.Delete(filePathNameOutput);
 
-            if (File.Exists(filePathNameOutput))
-                File.Delete(filePathNameOutput);
-
-            bitmap.Save(filePathNameOutput);
+            //bitmap.Save(filePathNameOutput);
 
             Console.WriteLine($"work with {countOfComparedPictures} pics");
             watch.Stop();
@@ -115,20 +144,18 @@ namespace ConsoleApp1
             }
         }
 
-        private static List<bool> GetHash(Bitmap bitmap)
+        private static List<bool> GetHash(Bitmap bitmap, int size, float precision)
         {
             List<bool> IResult = new List<bool>();
-            Bitmap bitmapMin = new Bitmap(bitmap, new Size(16, 16));
-            for(int y = 0; y<bitmapMin.Height; y++)
+            Bitmap bitmapMin = new Bitmap(bitmap, new Size(size, size));
+            for (int y = 0; y < bitmapMin.Height; y++)
             {
-                for(int x = 0; x < bitmapMin.Width; x++)
+                for (int x = 0; x < bitmapMin.Width; x++)
                 {
-                    IResult.Add(bitmapMin.GetPixel(x, y).GetBrightness() < 0.5f);
+                    IResult.Add(bitmapMin.GetPixel(x, y).GetBrightness() < precision);
                 }
             }
             return IResult;
         }
-
-
     }
 }
