@@ -21,6 +21,7 @@ namespace ConsoleApp1
 
             int sideSizeCompressedPicture = 16;
             float precisionIndex = 0.5f;
+            double precisionPercent = 0.99;
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -35,6 +36,9 @@ namespace ConsoleApp1
             {
                 for (int xComparedPicture = 0; xComparedPicture < bitmap.Width; xComparedPicture += stepPicX)
                 {
+                    Random randomColor = new Random();
+                    Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
+
                     for (int yNextPictures = 0; yNextPictures < bitmap.Height; yNextPictures += stepPicY)
                     {
                         for (int xNextPictures = 0; xNextPictures < bitmap.Width; xNextPictures += stepPicX)
@@ -61,8 +65,11 @@ namespace ConsoleApp1
 
                                 int equalElemets = iHash1.Zip(iHash2, (i, j) => i == j).Count(eq => eq);
                                 countOfComparedPictures++;
-                                if ((double)equalElemets / Math.Pow(sideSizeCompressedPicture, 2) > 0.99)
+                                if ((double)equalElemets / Math.Pow(sideSizeCompressedPicture, 2) > precisionPercent)
                                 {
+                                    ColoredDublicate(bitmap, xComparedPicture, yComparePicture, stepPicX, color);
+                                    ColoredDublicate(bitmap, xNextPictures, yNextPictures, stepPicX, color);
+
                                     Console.WriteLine($"X coordinate of compare Pic {xComparedPicture}");
                                     Console.WriteLine($"Y coordinate of compare Pic {yComparePicture}");
                                     Console.WriteLine($"X coordinate of compared Pic {xNextPictures}");
@@ -107,10 +114,10 @@ namespace ConsoleApp1
                 }
             }
 
-            //if (File.Exists(filePathNameOutput))
-            //    File.Delete(filePathNameOutput);
+            if (File.Exists(filePathNameOutput))
+                File.Delete(filePathNameOutput);
 
-            //bitmap.Save(filePathNameOutput);
+            bitmap.Save(filePathNameOutput);
 
             Console.WriteLine($"work with {countOfComparedPictures} pics");
             watch.Stop();
