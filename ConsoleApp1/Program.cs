@@ -20,13 +20,14 @@ namespace ConsoleApp1
             int stepPicY = 140;
 
             int sideSizeCompressedPicture = 8;
-            double precisionPercent = 0.97;
+            int powTwoSizeCompressedPicture = sideSizeCompressedPicture * sideSizeCompressedPicture;
+            double precisionPercent = 0.965;
 
             int countOfComparedPictures = 0;
 
             bool dublicate = false;
 
-            Dictionary<Point, byte[]> dictionaryPicHash = new Dictionary<Point, byte[]>();
+            Dictionary<Point, List<bool>> dictionaryPicHash = new Dictionary<Point, List<bool>>();
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -38,55 +39,82 @@ namespace ConsoleApp1
                     if (IsImage(bitmap))
                     {
                         float precisionIndex = StandartDeviationBrightness(bitmap);
+
                         for (int yComparePicture = 0; yComparePicture < bitmap.Height; yComparePicture += stepPicY)
                         {
                             for (int xComparedPicture = 0; xComparedPicture < bitmap.Width; xComparedPicture += stepPicX)
                             {
-                                Console.WriteLine($"Pic# {yComparePicture / 140 * bitmap.Width / 140 + xComparedPicture / 140 + 1}");
+                                Bitmap singlePicture = PurePicture(bitmap, xComparedPicture, yComparePicture, stepPicX, stepPicY);
+                                dictionaryPicHash.Add(new Point(xComparedPicture, yComparePicture), GetHash(singlePicture, sideSizeCompressedPicture, precisionIndex));
 
-                                foreach (Point coordinate in coordinatesComparedPictures)
+                                //Console.WriteLine($"Pic# {yComparePicture / 140 * bitmap.Width / 140 + xComparedPicture / 140 + 1}");
+                                //Console.WriteLine($"Pics Num = {dictionaryPicHash.Count}");
+
+                                //the same pics for don't compare
+                                //foreach (Point coordinate in coordinatesComparedPictures)
+                                //{
+                                //    if (coordinate.X == xComparedPicture && coordinate.Y == yComparePicture)
+                                //    {
+                                //        dublicate = true;
+                                //        break;
+                                //    }
+                                //    dublicate = false;
+                                //}
+
+                                //if (!dublicate)
+                                //{
+                                //    Random randomColor = new Random();
+                                //    Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
+                                //    Bitmap toComparePicture = PurePicture(bitmap, xComparedPicture, yComparePicture, stepPicX, stepPicY);
+
+                                //    for (int yNextPictures = 0; yNextPictures < bitmap.Height; yNextPictures += stepPicY)
+                                //    {
+                                //        for (int xNextPictures = 0; xNextPictures < bitmap.Width; xNextPictures += stepPicX)
+                                //        {
+                                //            if ((xNextPictures == xComparedPicture && yNextPictures == yComparePicture) ||
+                                //                (xNextPictures < xComparedPicture && yNextPictures < yComparePicture) ||
+                                //                (xNextPictures < xComparedPicture && yNextPictures == yComparePicture) ||
+                                //                (yNextPictures < yComparePicture)) continue;
+
+                                //            if (xComparedPicture < bitmap.Width)
+                                //            {
+
+                                //                     //Bitmap comparedPicture = PurePicture(bitmap, xNextPictures, yNextPictures, stepPicX, stepPicY);
+                                //                //if (ComparsionByHash(toComparePicture, comparedPicture, sideSizeCompressedPicture, precisionIndex) > precisionPercent)
+                                //                //{
+                                //                //    ColoredDublicate(bitmap, xComparedPicture, yComparePicture, stepPicX, color);
+                                //                //    ColoredDublicate(bitmap, xNextPictures, yNextPictures, stepPicX, color);
+
+                                //                //    coordinatesComparedPictures.Add(new Point(xNextPictures, yNextPictures));
+                                //                //}
+                                //                //countOfComparedPictures++;
+                                //            }
+                                //        }
+                                //    }
+                                //}
+                            }
+                        }
+
+
+                        foreach (KeyValuePair<Point, List<bool>> pair in dictionaryPicHash)
+                        {
+                            Random randomColor = new Random();
+                            Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
+
+                            foreach (KeyValuePair<Point, List<bool>> subPair in dictionaryPicHash)
+                            {
+                                //Console.WriteLine((double)ComparsionOnlyHash(pair.Value, subPair.Value) / powTwoSizeCompressedPicture);
+
+                                if (pair.Key == subPair.Key)
+                                    continue;
+                                else if(((double)ComparsionOnlyHash(pair.Value, subPair.Value) / powTwoSizeCompressedPicture) > precisionPercent)
                                 {
-                                    if (coordinate.X == xComparedPicture && coordinate.Y == yComparePicture)
-                                    {
-                                        dublicate = true;
-                                        break;
-                                    }
-                                    dublicate = false;
-                                }
-
-                                if (!dublicate)
-                                {
-                                    Random randomColor = new Random();
-                                    Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
-                                    Bitmap toComparePicture = PurePicture(bitmap, xComparedPicture, yComparePicture, stepPicX, stepPicY);
-
-                                    for (int yNextPictures = 0; yNextPictures < bitmap.Height; yNextPictures += stepPicY)
-                                    {
-                                        for (int xNextPictures = 0; xNextPictures < bitmap.Width; xNextPictures += stepPicX)
-                                        {
-                                            if ((xNextPictures == xComparedPicture && yNextPictures == yComparePicture) ||
-                                                (xNextPictures < xComparedPicture && yNextPictures < yComparePicture) ||
-                                                (xNextPictures < xComparedPicture && yNextPictures == yComparePicture) ||
-                                                (yNextPictures < yComparePicture)) continue;
-
-                                            if (xComparedPicture < bitmap.Width)
-                                            {
-                                                //Console.WriteLine(xNextPictures);
-                                                Bitmap comparedPicture = PurePicture(bitmap, xNextPictures, yNextPictures, stepPicX, stepPicY);
-                                                if (ComparsionByHash(toComparePicture, comparedPicture, sideSizeCompressedPicture, precisionIndex) > precisionPercent)
-                                                {
-                                                    ColoredDublicate(bitmap, xComparedPicture, yComparePicture, stepPicX, color);
-                                                    ColoredDublicate(bitmap, xNextPictures, yNextPictures, stepPicX, color);
-
-                                                    coordinatesComparedPictures.Add(new Point(xNextPictures, yNextPictures));
-                                                }
-                                                countOfComparedPictures++;
-                                            }
-                                        }
-                                    }
+                                    ColoredDublicate(bitmap, pair.Key.X, pair.Key.Y, stepPicX, color);
+                                    ColoredDublicate(bitmap, subPair.Key.X, subPair.Key.Y, stepPicX, color);
                                 }
                             }
                         }
+
 
                         if (File.Exists(filePathNameOutput))
                             File.Delete(filePathNameOutput);
@@ -237,18 +265,17 @@ namespace ConsoleApp1
             return purePicure;
         }
 
+        private static int ComparsionOnlyHash(List<bool> hash1, List<bool> hash2)
+        {
+            return hash1.Zip(hash2, (i, j) => i == j).Count(eq => eq);
+        }
+
         private static double ComparsionByHash(Bitmap _bitmap1, Bitmap _bitmap2, int _sideSizeCompressedPicture, float _precisionIndex)
         {
             List<bool> iHash1 = GetHash(_bitmap1, _sideSizeCompressedPicture, _precisionIndex);
             List<bool> iHash2 = GetHash(_bitmap2, _sideSizeCompressedPicture, _precisionIndex);
 
-
             int equalElemets = iHash1.Zip(iHash2, (i, j) => i == j).Count(eq => eq);
-
-            //Console.WriteLine($"X compared Pic: {_xComparedPicture / 140}");
-            //Console.WriteLine($"X nex Pic: {_xNextPictures / 140}");
-            //Console.WriteLine($"precision: {(double)equalElemets / (_sideSizeCompressedPicture * _sideSizeCompressedPicture)}");
-            //Console.WriteLine();
 
             return (double)equalElemets / (_sideSizeCompressedPicture * _sideSizeCompressedPicture);
         }
