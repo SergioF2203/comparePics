@@ -44,7 +44,6 @@ namespace ConsoleApp1
             Dictionary<Point, List<bool>> dictionaryPicHash = new Dictionary<Point, List<bool>>();
             Dictionary<Point, List<bool>> dictionaryPicHash90 = new Dictionary<Point, List<bool>>();
             Dictionary<Point, SizeOfPic> dictionaryOfSizes = new Dictionary<Point, SizeOfPic>();
-            List<SizeOfPic> listOfSizes = new List<SizeOfPic>();
 
 
 
@@ -55,15 +54,15 @@ namespace ConsoleApp1
                 using (Bitmap picfile = new Bitmap(filePathName))
                 {
 
-                    Bitmap forTest = new Bitmap(@"D:\C#\testForRotate.png"); //for testing picture
-                    Bitmap forTest2 = new Bitmap(forTest);
+                    //Bitmap forTest = new Bitmap(@"D:\C#\testForRotate.png"); //for testing picture
+                    //Bitmap forTest2 = new Bitmap(forTest);
 
 
                     Bitmap bitmap = new Bitmap(picfile);
                     if (IsImage(bitmap))
                     {
                         float precisionIndex = StandartDeviationBrightness(bitmap);
-                        Bitmap forTestBitmap = PurePicture(forTest2, 0, 0, 140, 140); //testing pictures
+                        //Bitmap forTestBitmap = PurePicture(forTest2, 0, 0, 140, 140); //testing pictures
                         //dictionaryPicHash90.Add(new Point(0, 0), GetHash(forTestBitmap, 90, sideSizeCompressedPicture, precisionIndex)); //testing picture
 
 
@@ -75,30 +74,30 @@ namespace ConsoleApp1
                                 Bitmap singlePictureRotate = PurePicture(bitmap, xComparedPicture, yComparePicture, stepPicX, stepPicY);
 
 
-                                List<bool> originList = new List<bool>();
-                                for (int y = 0; y < singlePicture.Height; y++)
-                                {
-                                    for (int x = 0; x < singlePicture.Width; x++)
-                                    {
-                                        if (singlePicture.GetPixel(x, y).GetBrightness() != 0)
-                                            originList.Add(true);
-                                        else
-                                            originList.Add(false);
-                                    }
-                                }
+                                List<bool> originList = GetWholeHash(singlePicture, 0);
+                                //for (int y = 0; y < singlePicture.Height; y++)
+                                //{
+                                //    for (int x = 0; x < singlePicture.Width; x++)
+                                //    {
+                                //        if (singlePicture.GetPixel(x, y).GetBrightness() != 0)
+                                //            originList.Add(true);
+                                //        else
+                                //            originList.Add(false);
+                                //    }
+                                //}
 
-                                List<bool> rotateList = new List<bool>();
-                                for (int y = 0; y < singlePictureRotate.Height; y++)
-                                {
-                                    for (int x = singlePictureRotate.Width - 1; x >= 0; x--)
-                                    {
-                                        if (singlePictureRotate.GetPixel(x, y).GetBrightness() != 0)
-                                            rotateList.Add(true);
-                                        else
-                                            rotateList.Add(false);
+                                List<bool> rotateList = GetWholeHash(singlePictureRotate, 180180);
+                                //for (int y = 0; y < singlePictureRotate.Height; y++)
+                                //{
+                                //    for (int x = singlePictureRotate.Width - 1; x >= 0; x--)
+                                //    {
+                                //        if (singlePictureRotate.GetPixel(x, y).GetBrightness() != 0)
+                                //            rotateList.Add(true);
+                                //        else
+                                //            rotateList.Add(false);
 
-                                    }
-                                }
+                                //    }
+                                //}
 
 
 
@@ -242,6 +241,79 @@ namespace ConsoleApp1
                 //Console.WriteLine("The file does not have a valid image format");
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private static List<bool> GetWholeHash(Bitmap _bitmap, int _direction)
+        {
+            List<bool> listOfResults = new List<bool>();
+
+            switch (_direction)
+            {
+                case 0:
+                    for (int y = 0; y < _bitmap.Height; y++)
+                    {
+                        for (int x = 0; x < _bitmap.Width; x++)
+                        {
+                            if (_bitmap.GetPixel(x, y).GetBrightness() != 0)
+                                listOfResults.Add(true);
+                            else
+                                listOfResults.Add(false);
+                        }
+                    }
+                    break;
+                case 90:
+                    for (int x = _bitmap.Width - 1; x >= 0; x--)
+                    {
+                        for (int y = 0; y < _bitmap.Height; y++)
+                        {
+                            if (_bitmap.GetPixel(x, y).GetBrightness() != 0)
+                                listOfResults.Add(true);
+                            else
+                                listOfResults.Add(false);
+                        }
+                    }
+                    break;
+                case 180:
+                    for (int y = _bitmap.Height - 1; y >= 0; y--)
+                    {
+                        for (int x = _bitmap.Width - 1; x >= 0; x--)
+                        {
+                            if (_bitmap.GetPixel(x, y).GetBrightness() != 0)
+                                listOfResults.Add(true);
+                            else
+                                listOfResults.Add(false);
+                        }
+                    }
+                    break;
+                case 270:
+                    for (int x = 0; x < _bitmap.Width; x++)
+                    {
+                        for (int y = _bitmap.Height - 1; y >= 0; y--)
+                        {
+                            if (_bitmap.GetPixel(x, y).GetBrightness() != 0)
+                                listOfResults.Add(true);
+                            else
+                                listOfResults.Add(false);
+                        }
+                    }
+                    break;
+                case 180180:
+                    for (int y = 0; y < _bitmap.Height; y++)
+                    {
+                        for (int x = _bitmap.Width - 1; x >= 0; x--)
+                        {
+                            if (_bitmap.GetPixel(x, y).GetBrightness() != 0)
+                                listOfResults.Add(true);
+                            else
+                                listOfResults.Add(false);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return listOfResults;
         }
 
         private static double CompareHashs(List<bool> hash1, List<bool> hash2)
