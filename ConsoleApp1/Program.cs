@@ -189,78 +189,7 @@ namespace ConsoleApp1
                         //    }
                         //}
 
-                        //List<bool> listFromFirstPic = new List<bool>();
-                        //List<bool> listFromSecondPic = new List<bool>();
 
-                        //Bitmap bitmap1 = new Bitmap(@"D:\C#\0degreeRotTest.png");
-                        //Bitmap firstPic = PurePicture(new Bitmap(bitmap1), 0, 0, 140, 140);
-
-                        //Bitmap bitmap2 = new Bitmap(@"D:\C#\180degreeRotTest.png");
-                        //Bitmap secondPic = PurePicture(new Bitmap(bitmap2), 0, 0, 140, 140);
-
-
-                        //for (int y = 0; y < firstPic.Height; y++)
-                        //{
-                        //    for (int x = 0; x < firstPic.Width; x++)
-                        //    {
-                        //        if (firstPic.GetPixel(x, y).GetBrightness() != 0)
-                        //            listFromFirstPic.Add(true);
-                        //        else
-                        //            listFromFirstPic.Add(false);
-                        //    }
-                        //}
-
-                        //90
-                        //for (int x = secondPic.Width - 1; x >= 0; x--)
-                        //{
-                        //    for (int y = 0; y < secondPic.Height; y++)
-                        //    {
-                        //        if (secondPic.GetPixel(x, y).GetBrightness() != 0)
-                        //            listFromSecondPic.Add(true);
-                        //        else
-                        //            listFromSecondPic.Add(false);
-                        //    }
-                        //}
-
-                        ////180
-                        //for (int y = secondPic.Height - 1; y >= 0; y--)
-                        //{
-                        //    for (int x = secondPic.Width - 1; x >= 0; x--)
-                        //    {
-                        //        if (secondPic.GetPixel(x, y).GetBrightness() != 0)
-                        //            listFromSecondPic.Add(true);
-                        //        else
-                        //            listFromSecondPic.Add(false);
-                        //    }
-                        //}
-
-                        //270 degree
-                        //for (int x = 0; x < secondPic.Width; x++)
-                        //{
-                        //    for (int y = secondPic.Height - 1; y >= 0; y--)
-                        //    {
-                        //        if (secondPic.GetPixel(x, y).GetBrightness() != 0)
-                        //            listFromSecondPic.Add(true);
-                        //        else
-                        //            listFromSecondPic.Add(false);
-                        //    }
-                        //}
-
-                        //flip
-                        //for (int y = 0; y < secondPic.Height; y++)
-                        //{
-                        //    for (int x = secondPic.Width - 1; x >= 0; x--)
-                        //    {
-                        //        if (secondPic.GetPixel(x, y).GetBrightness() != 0)
-                        //            listFromSecondPic.Add(true);
-                        //        else
-                        //            listFromSecondPic.Add(false);
-
-                        //    }
-                        //}
-
-
-                        //Console.WriteLine($"compared = {CompareHashs(listFromFirstPic, listFromSecondPic)}");
 
 
                         if (File.Exists(filePathNameOutput))
@@ -283,7 +212,6 @@ namespace ConsoleApp1
             }
             catch (Exception ex)
             {
-                //Console.WriteLine("The file does not have a valid image format");
                 Console.WriteLine(ex.Message);
             }
         }
@@ -294,8 +222,6 @@ namespace ConsoleApp1
             {
                 if (item == _point)
                     return true;
-                else
-                    return false;
             }
 
             return false;
@@ -308,6 +234,12 @@ namespace ConsoleApp1
             else if (size1.Height == size2.Width && size1.Width == size2.Height)
                 return 2;
             return 0;
+        }
+
+        private static void ColoredAndAddCoordinate(Bitmap _bitmap, int _x, int _y, int _step, Color _color, List<Point> _list, Point _point)
+        {
+            ColoredDublicate(_bitmap, _x, _y, _step, _color);
+            _list.Add(_point);
         }
 
         private static List<bool> GetWholeHash(Bitmap _bitmap, int _direction)
