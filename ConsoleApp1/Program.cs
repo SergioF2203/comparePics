@@ -9,19 +9,6 @@ namespace ConsoleApp1
 {
     class Program
     {
-        struct SizeOfPic
-        {
-            public int width;
-            public int height;
-
-
-            public SizeOfPic(int _width, int _height)
-            {
-                width = _width;
-                height = _height;
-            }
-        }
-
         static void Main(string[] args)
         {
 
@@ -39,11 +26,13 @@ namespace ConsoleApp1
 
             int countOfComparedPictures = 0;
 
-            bool dublicate = false;
-
             Dictionary<Point, List<bool>> dictionaryPicHash = new Dictionary<Point, List<bool>>();
             Dictionary<Point, List<bool>> dictionaryPicHash90 = new Dictionary<Point, List<bool>>();
-            Dictionary<Point, SizeOfPic> dictionaryOfSizes = new Dictionary<Point, SizeOfPic>();
+            Dictionary<Point, List<bool>> dictionaryPicHash180 = new Dictionary<Point, List<bool>>();
+            Dictionary<Point, List<bool>> dictionaryPicHash270 = new Dictionary<Point, List<bool>>();
+            Dictionary<Point, List<bool>> dictionaryPicHashFlip = new Dictionary<Point, List<bool>>();
+
+            Dictionary<Point, Size> dictionaryOfSizes = new Dictionary<Point, Size>();
 
 
 
@@ -53,70 +42,48 @@ namespace ConsoleApp1
             {
                 using (Bitmap picfile = new Bitmap(filePathName))
                 {
-
-                    //Bitmap forTest = new Bitmap(@"D:\C#\testForRotate.png"); //for testing picture
-                    //Bitmap forTest2 = new Bitmap(forTest);
-
-
                     Bitmap bitmap = new Bitmap(picfile);
                     if (IsImage(bitmap))
                     {
                         float precisionIndex = StandartDeviationBrightness(bitmap);
-                        //Bitmap forTestBitmap = PurePicture(forTest2, 0, 0, 140, 140); //testing pictures
-                        //dictionaryPicHash90.Add(new Point(0, 0), GetHash(forTestBitmap, 90, sideSizeCompressedPicture, precisionIndex)); //testing picture
-
 
                         for (int yComparePicture = 0; yComparePicture < bitmap.Height; yComparePicture += stepPicY)
                         {
                             for (int xComparedPicture = 0; xComparedPicture < bitmap.Width; xComparedPicture += stepPicX)
                             {
                                 Bitmap singlePicture = PurePicture(bitmap, xComparedPicture, yComparePicture, stepPicX, stepPicY);
-                                Bitmap singlePictureRotate = PurePicture(bitmap, xComparedPicture, yComparePicture, stepPicX, stepPicY);
 
+                                dictionaryPicHash.Add(new Point(xComparedPicture, yComparePicture), GetWholeHash(singlePicture, 0));
+                                dictionaryPicHash90.Add(new Point(xComparedPicture, yComparePicture), GetWholeHash(singlePicture, 90));
+                                dictionaryPicHash180.Add(new Point(xComparedPicture, yComparePicture), GetWholeHash(singlePicture, 180));
+                                dictionaryPicHash270.Add(new Point(xComparedPicture, yComparePicture), GetWholeHash(singlePicture, 270));
+                                dictionaryPicHashFlip.Add(new Point(xComparedPicture, yComparePicture), GetWholeHash(singlePicture, 180180));
 
-                                List<bool> originList = GetWholeHash(singlePicture, 0);
-                                //for (int y = 0; y < singlePicture.Height; y++)
-                                //{
-                                //    for (int x = 0; x < singlePicture.Width; x++)
-                                //    {
-                                //        if (singlePicture.GetPixel(x, y).GetBrightness() != 0)
-                                //            originList.Add(true);
-                                //        else
-                                //            originList.Add(false);
-                                //    }
-                                //}
-
-                                List<bool> rotateList = GetWholeHash(singlePictureRotate, 180180);
-                                //for (int y = 0; y < singlePictureRotate.Height; y++)
-                                //{
-                                //    for (int x = singlePictureRotate.Width - 1; x >= 0; x--)
-                                //    {
-                                //        if (singlePictureRotate.GetPixel(x, y).GetBrightness() != 0)
-                                //            rotateList.Add(true);
-                                //        else
-                                //            rotateList.Add(false);
-
-                                //    }
-                                //}
-
-
-
-
-                                dictionaryPicHash.Add(new Point(xComparedPicture, yComparePicture), originList);
-                                dictionaryPicHash90.Add(new Point(xComparedPicture, yComparePicture), rotateList);
-                                dictionaryOfSizes.Add(new Point(xComparedPicture, yComparePicture), new SizeOfPic(singlePicture.Width, singlePicture.Height));
-
-
-                                //Console.WriteLine($"Pic# {yComparePicture / 140 * bitmap.Width / 140 + xComparedPicture / 140 + 1}");
-                                //Console.WriteLine($"Pics Num = {dictionaryPicHash.Count}");
-
+                                dictionaryOfSizes.Add(new Point(xComparedPicture, yComparePicture), new Size(singlePicture.Width, singlePicture.Height));
                             }
                         }
 
-                        foreach(KeyValuePair<Point, SizeOfPic> size in dictionaryOfSizes)
+
+
+                        foreach (KeyValuePair<Point, Size> size in dictionaryOfSizes)
                         {
-                                Console.WriteLine($"Width = {size.Value.width}, Height = {size.Value.height}");
+                            Console.WriteLine($"X={size.Key.X}, Y={size.Key.Y}");
+                            Console.WriteLine($"Width = {size.Value.Width}, Height = {size.Value.Height}");
                         }
+
+                        int countOfComp = 0;
+                        foreach(KeyValuePair<Point, Size> item in dictionaryOfSizes)
+                        {
+                            foreach(KeyValuePair<Point, Size> subItem in dictionaryOfSizes)
+                            {
+                                if (item.Key.X == subItem.Key.X && item.Key.Y == subItem.Key.Y)
+                                    continue;
+                                Console.WriteLine(IsProportionate(item.Value, subItem.Value));
+                                countOfComp++;
+                            }
+                        }
+                        Console.WriteLine(countOfComp);
+                        Console.WriteLine(IsExist(dictionaryOfSizes, dictionaryOfSizes.ElementAt(7).Key));
 
 
 
@@ -125,7 +92,7 @@ namespace ConsoleApp1
                             Random randomColor = new Random();
                             Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
 
-                            foreach (KeyValuePair<Point, List<bool>> subPair in dictionaryPicHash90)
+                            foreach (KeyValuePair<Point, List<bool>> subPair in dictionaryPicHashFlip)
                             {
                                 //Console.WriteLine((double)ComparsionOnlyHash(pair.Value, subPair.Value) / powTwoSizeCompressedPicture);
 
@@ -241,6 +208,28 @@ namespace ConsoleApp1
                 //Console.WriteLine("The file does not have a valid image format");
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private static bool IsExist(Dictionary<Point, Size> _dictionary, Point _point)
+        {
+            foreach (KeyValuePair<Point, Size> item in _dictionary)
+            {
+                if (item.Key.X == _point.X && item.Key.Y == _point.Y)
+                    return true;
+                else
+                    return false;
+            }
+
+            return false;
+        }
+
+        private static int IsProportionate (Size size1, Size size2)
+        {
+            if (size1.Width == size2.Width && size1.Height == size2.Height)
+                return 1;
+            else if (size1.Height == size2.Width && size1.Width == size2.Height)
+                return 2;
+            return 0;
         }
 
         private static List<bool> GetWholeHash(Bitmap _bitmap, int _direction)
