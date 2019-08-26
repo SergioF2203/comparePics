@@ -33,6 +33,7 @@ namespace ConsoleApp1
             Dictionary<Point, List<bool>> dictionaryPicHashFlip = new Dictionary<Point, List<bool>>();
 
             Dictionary<Point, Size> dictionaryOfSizes = new Dictionary<Point, Size>();
+            List<Point> listOfPointComparedPic = new List<Point>();
 
 
 
@@ -65,71 +66,149 @@ namespace ConsoleApp1
 
 
 
-                        foreach (KeyValuePair<Point, Size> size in dictionaryOfSizes)
+                        //foreach (KeyValuePair<Point, Size> size in dictionaryOfSizes)
+                        //{
+                        //    Console.WriteLine($"X={size.Key.X}, Y={size.Key.Y}");
+                        //    Console.WriteLine($"Width = {size.Value.Width}, Height = {size.Value.Height}");
+                        //}
+
+                        //int countOfComp = 0;
+                        //foreach (KeyValuePair<Point, Size> item in dictionaryOfSizes)
+                        //{
+                        //    foreach (KeyValuePair<Point, Size> subItem in dictionaryOfSizes)
+                        //    {
+                        //        if (item.Key == subItem.Key)
+                        //            continue;
+                        //        //Console.WriteLine(IsProportionate(item.Value, subItem.Value));
+                        //        countOfComp++;
+                        //    }
+                        //}
+
+                        //Console.WriteLine(countOfComp);
+                        //Console.WriteLine(IsExist(dictionaryOfSizes, dictionaryOfSizes.ElementAt(7).Key));
+
+                        foreach (KeyValuePair<Point, Size> item in dictionaryOfSizes)
                         {
-                            Console.WriteLine($"X={size.Key.X}, Y={size.Key.Y}");
-                            Console.WriteLine($"Width = {size.Value.Width}, Height = {size.Value.Height}");
-                        }
+                            if (IsExist(listOfPointComparedPic, item.Key))
+                                continue;
 
-                        int countOfComp = 0;
-                        foreach(KeyValuePair<Point, Size> item in dictionaryOfSizes)
-                        {
-                            foreach(KeyValuePair<Point, Size> subItem in dictionaryOfSizes)
-                            {
-                                if (item.Key.X == subItem.Key.X && item.Key.Y == subItem.Key.Y)
-                                    continue;
-                                Console.WriteLine(IsProportionate(item.Value, subItem.Value));
-                                countOfComp++;
-                            }
-                        }
-                        Console.WriteLine(countOfComp);
-                        Console.WriteLine(IsExist(dictionaryOfSizes, dictionaryOfSizes.ElementAt(7).Key));
-
-
-
-                        foreach (KeyValuePair<Point, List<bool>> pair in dictionaryPicHash)
-                        {
                             Random randomColor = new Random();
                             Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
 
-                            foreach (KeyValuePair<Point, List<bool>> subPair in dictionaryPicHashFlip)
+                            foreach (KeyValuePair<Point, Size> subItem in dictionaryOfSizes)
                             {
-                                //Console.WriteLine((double)ComparsionOnlyHash(pair.Value, subPair.Value) / powTwoSizeCompressedPicture);
-
-
-                                if (pair.Key == subPair.Key)
+                                if (subItem.Key == item.Key)
                                     continue;
-                                //else if (((double)ComparsionOnlyHash(pair.Value, subPair.Value) / powTwoSizeCompressedPicture) > precisionPercent)
-                                else if (CompareHashs(pair.Value, subPair.Value) > precisionPercent)
+
+                                if (IsExist(listOfPointComparedPic, subItem.Key))
+                                    continue;
+
+                                if (item.Key.Y > subItem.Key.Y || (item.Key.Y == subItem.Key.Y && item.Key.X > subItem.Key.X))
+                                    continue;
+
+                                int proportionate = IsProportionate(item.Value, subItem.Value);
+
+                                if (proportionate != 0)
                                 {
-                                    ColoredDublicate(bitmap, pair.Key.X, pair.Key.Y, stepPicX, color);
-                                    ColoredDublicate(bitmap, subPair.Key.X, subPair.Key.Y, stepPicX, color);
+
+                                    if (proportionate == 1)
+                                    {
+                                        if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent)
+                                        {
+                                            ColoredDublicate(bitmap, item.Key.X, item.Key.Y, stepPicX, color);
+                                            listOfPointComparedPic.Add(item.Key);
+
+                                            ColoredDublicate(bitmap, subItem.Key.X, subItem.Key.Y, stepPicX, color);
+                                            listOfPointComparedPic.Add(subItem.Key);
+                                        }
+
+                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent)
+                                        {
+                                            ColoredDublicate(bitmap, item.Key.X, item.Key.Y, stepPicX, color);
+                                            listOfPointComparedPic.Add(item.Key);
+
+                                            ColoredDublicate(bitmap, subItem.Key.X, subItem.Key.Y, stepPicX, color);
+                                            listOfPointComparedPic.Add(subItem.Key);
+                                        }
+
+                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent)
+                                        {
+                                            ColoredDublicate(bitmap, item.Key.X, item.Key.Y, stepPicX, color);
+                                            listOfPointComparedPic.Add(item.Key);
+
+                                            ColoredDublicate(bitmap, subItem.Key.X, subItem.Key.Y, stepPicX, color);
+                                            listOfPointComparedPic.Add(subItem.Key);
+                                        }
+
+                                    }
+                                    else if (proportionate == 2)
+                                    {
+
+                                        if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent)
+                                        {
+                                            ColoredDublicate(bitmap, item.Key.X, item.Key.Y, stepPicX, color);
+                                            listOfPointComparedPic.Add(item.Key);
+
+                                            ColoredDublicate(bitmap, subItem.Key.X, subItem.Key.Y, stepPicX, color);
+                                            listOfPointComparedPic.Add(subItem.Key);
+                                        }
+
+                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent)
+                                        {
+                                            ColoredDublicate(bitmap, item.Key.X, item.Key.Y, stepPicX, color);
+                                            listOfPointComparedPic.Add(item.Key);
+
+                                            ColoredDublicate(bitmap, subItem.Key.X, subItem.Key.Y, stepPicX, color);
+                                            listOfPointComparedPic.Add(subItem.Key);
+                                        }
+                                    }
                                 }
-                                Console.WriteLine(CompareHashs(pair.Value, subPair.Value));
-
                             }
                         }
 
-                        List<bool> listFromFirstPic = new List<bool>();
-                        List<bool> listFromSecondPic = new List<bool>();
+                        //foreach (KeyValuePair<Point, List<bool>> pair in dictionaryPicHash)
+                        //{
+                        //    Random randomColor = new Random();
+                        //    Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
 
-                        Bitmap bitmap1 = new Bitmap(@"D:\C#\0degreeRotTest.png");
-                        Bitmap firstPic = PurePicture(new Bitmap(bitmap1), 0, 0, 140, 140);
-
-                        Bitmap bitmap2 = new Bitmap(@"D:\C#\180degreeRotTest.png");
-                        Bitmap secondPic = PurePicture(new Bitmap(bitmap2), 0, 0, 140, 140);
+                        //    foreach (KeyValuePair<Point, List<bool>> subPair in dictionaryPicHashFlip)
+                        //    {
+                        //        //Console.WriteLine((double)ComparsionOnlyHash(pair.Value, subPair.Value) / powTwoSizeCompressedPicture);
 
 
-                        for (int y = 0; y < firstPic.Height; y++)
-                        {
-                            for (int x = 0; x < firstPic.Width; x++)
-                            {
-                                if (firstPic.GetPixel(x, y).GetBrightness() != 0)
-                                    listFromFirstPic.Add(true);
-                                else
-                                    listFromFirstPic.Add(false);
-                            }
-                        }
+                        //        if (pair.Key == subPair.Key)
+                        //            continue;
+                        //        //else if (((double)ComparsionOnlyHash(pair.Value, subPair.Value) / powTwoSizeCompressedPicture) > precisionPercent)
+                        //        else if (CompareHashs(pair.Value, subPair.Value) > precisionPercent)
+                        //        {
+                        //            ColoredDublicate(bitmap, pair.Key.X, pair.Key.Y, stepPicX, color);
+                        //            ColoredDublicate(bitmap, subPair.Key.X, subPair.Key.Y, stepPicX, color);
+                        //        }
+                        //        Console.WriteLine(CompareHashs(pair.Value, subPair.Value));
+
+                        //    }
+                        //}
+
+                        //List<bool> listFromFirstPic = new List<bool>();
+                        //List<bool> listFromSecondPic = new List<bool>();
+
+                        //Bitmap bitmap1 = new Bitmap(@"D:\C#\0degreeRotTest.png");
+                        //Bitmap firstPic = PurePicture(new Bitmap(bitmap1), 0, 0, 140, 140);
+
+                        //Bitmap bitmap2 = new Bitmap(@"D:\C#\180degreeRotTest.png");
+                        //Bitmap secondPic = PurePicture(new Bitmap(bitmap2), 0, 0, 140, 140);
+
+
+                        //for (int y = 0; y < firstPic.Height; y++)
+                        //{
+                        //    for (int x = 0; x < firstPic.Width; x++)
+                        //    {
+                        //        if (firstPic.GetPixel(x, y).GetBrightness() != 0)
+                        //            listFromFirstPic.Add(true);
+                        //        else
+                        //            listFromFirstPic.Add(false);
+                        //    }
+                        //}
 
                         //90
                         //for (int x = secondPic.Width - 1; x >= 0; x--)
@@ -143,17 +222,17 @@ namespace ConsoleApp1
                         //    }
                         //}
 
-                        //180
-                        for (int y = secondPic.Height - 1; y >= 0; y--)
-                        {
-                            for (int x = secondPic.Width - 1; x >= 0; x--)
-                            {
-                                if (secondPic.GetPixel(x, y).GetBrightness() != 0)
-                                    listFromSecondPic.Add(true);
-                                else
-                                    listFromSecondPic.Add(false);
-                            }
-                        }
+                        ////180
+                        //for (int y = secondPic.Height - 1; y >= 0; y--)
+                        //{
+                        //    for (int x = secondPic.Width - 1; x >= 0; x--)
+                        //    {
+                        //        if (secondPic.GetPixel(x, y).GetBrightness() != 0)
+                        //            listFromSecondPic.Add(true);
+                        //        else
+                        //            listFromSecondPic.Add(false);
+                        //    }
+                        //}
 
                         //270 degree
                         //for (int x = 0; x < secondPic.Width; x++)
@@ -181,8 +260,7 @@ namespace ConsoleApp1
                         //}
 
 
-                        Console.WriteLine("and now ...");
-                        Console.WriteLine($"compared = {CompareHashs(listFromFirstPic, listFromSecondPic)}");
+                        //Console.WriteLine($"compared = {CompareHashs(listFromFirstPic, listFromSecondPic)}");
 
 
                         if (File.Exists(filePathNameOutput))
@@ -210,11 +288,11 @@ namespace ConsoleApp1
             }
         }
 
-        private static bool IsExist(Dictionary<Point, Size> _dictionary, Point _point)
+        private static bool IsExist(List<Point> _listOfPoints, Point _point)
         {
-            foreach (KeyValuePair<Point, Size> item in _dictionary)
+            foreach (Point item in _listOfPoints)
             {
-                if (item.Key.X == _point.X && item.Key.Y == _point.Y)
+                if (item == _point)
                     return true;
                 else
                     return false;
@@ -223,7 +301,7 @@ namespace ConsoleApp1
             return false;
         }
 
-        private static int IsProportionate (Size size1, Size size2)
+        private static int IsProportionate(Size size1, Size size2)
         {
             if (size1.Width == size2.Width && size1.Height == size2.Height)
                 return 1;
@@ -316,8 +394,8 @@ namespace ConsoleApp1
                     counter++;
             }
 
-            Console.WriteLine($"counter = {counter}");
-            Console.WriteLine($"all items = {hash1.Count}");
+            //Console.WriteLine($"counter = {counter}");
+            //Console.WriteLine($"all items = {hash1.Count}");
 
             return (double)counter / hash1.Count;
         }
