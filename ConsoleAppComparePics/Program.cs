@@ -21,7 +21,7 @@ namespace ConsoleApp1
 
             int sideSizeCompressedPicture = 8;
             int powTwoSizeCompressedPicture = sideSizeCompressedPicture * sideSizeCompressedPicture;
-            double precisionPercent = Convert.ToDouble(ConfigurationManager.AppSettings.Get("precision"))/100;
+            double precisionPercent = Convert.ToDouble(ConfigurationManager.AppSettings.Get("precision")) / 100;
 
             int proportionate = 0;
 
@@ -98,56 +98,13 @@ namespace ConsoleApp1
                                 {
                                     if (proportionate != 0)
                                     {
-                                        if (proportionate == 1)
+                                        if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent ||
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent ||
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent ||
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent ||
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent)
                                         {
-                                            if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent)
-                                            {
-                                                setOfDupsPic.Add(item.Key);
-                                                setComparedPic.Add(subItem.Key);
-
-                                                listOfPointComparedPic.Add(item.Key);
-                                                listOfPointComparedPic.Add(subItem.Key);
-                                            }
-
-                                            else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent)
-                                            {
-                                                setOfDupsPic.Add(item.Key);
-                                                setComparedPic.Add(subItem.Key);
-
-                                                listOfPointComparedPic.Add(item.Key);
-                                                listOfPointComparedPic.Add(subItem.Key);
-                                            }
-
-                                            else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent)
-                                            {
-                                                setOfDupsPic.Add(item.Key);
-                                                setComparedPic.Add(subItem.Key);
-
-                                                listOfPointComparedPic.Add(item.Key);
-                                                listOfPointComparedPic.Add(subItem.Key);
-                                            }
-
-                                        }
-                                        else if (proportionate == 2)
-                                        {
-
-                                            if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent)
-                                            {
-                                                setOfDupsPic.Add(item.Key);
-                                                setComparedPic.Add(subItem.Key);
-
-                                                listOfPointComparedPic.Add(item.Key);
-                                                listOfPointComparedPic.Add(subItem.Key);
-                                            }
-
-                                            else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent)
-                                            {
-                                                setOfDupsPic.Add(item.Key);
-                                                setComparedPic.Add(subItem.Key);
-
-                                                listOfPointComparedPic.Add(item.Key);
-                                                listOfPointComparedPic.Add(subItem.Key);
-                                            }
+                                            AddPoinsToHashsetList(setOfDupsPic, setComparedPic, item.Key, subItem.Key, listOfPointComparedPic);
                                         }
                                     }
 
@@ -221,6 +178,15 @@ namespace ConsoleApp1
         {
             ColoredDublicate(_bitmap, _x, _y, _step, _color);
             _list.Add(_point);
+        }
+
+        private static void AddPoinsToHashsetList(HashSet<Point> hashSet1, HashSet<Point> hashSet2, Point point1, Point point2, List<Point> list)
+        {
+            hashSet1.Add(point1);
+            hashSet2.Add(point2);
+
+            list.Add(point1);
+            list.Add(point2);
         }
 
         private static List<bool> GetWholeHash(Bitmap _bitmap, int _direction)
@@ -312,7 +278,7 @@ namespace ConsoleApp1
 
         private static void ColoredDublicate(Bitmap bitmap, int leftUpperCornerX, int leftUpperCornerY, int sideSizeRect, Color color)
         {
-            for (int i = leftUpperCornerX+2; i < leftUpperCornerX + sideSizeRect-2; i++)
+            for (int i = leftUpperCornerX + 2; i < leftUpperCornerX + sideSizeRect - 2; i++)
             {
                 //Upper horizontal line
                 bitmap.SetPixel(i, leftUpperCornerY + 2, color);
@@ -402,13 +368,13 @@ namespace ConsoleApp1
             List<bool> IResult = new List<bool>();
             Bitmap bitmapMin = new Bitmap(bitmap, new Size(size, size));
 
-                    for (int y = 0; y < bitmapMin.Height; y++)
-                    {
-                        for (int x = 0; x < bitmapMin.Width; x++)
-                        {
-                            IResult.Add(bitmapMin.GetPixel(x, y).GetBrightness() < precision);
-                        }
-                    }
+            for (int y = 0; y < bitmapMin.Height; y++)
+            {
+                for (int x = 0; x < bitmapMin.Width; x++)
+                {
+                    IResult.Add(bitmapMin.GetPixel(x, y).GetBrightness() < precision);
+                }
+            }
             return IResult;
         }
 
