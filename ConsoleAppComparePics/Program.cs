@@ -21,7 +21,7 @@ namespace ConsoleApp1
 
             int sideSizeCompressedPicture = 8;
             int powTwoSizeCompressedPicture = sideSizeCompressedPicture * sideSizeCompressedPicture;
-            double precisionPercent = Convert.ToDouble(ConfigurationManager.AppSettings.Get("precision"));
+            double precisionPercent = Convert.ToDouble(ConfigurationManager.AppSettings.Get("precision"))/100;
 
             int proportionate = 0;
 
@@ -173,8 +173,6 @@ namespace ConsoleApp1
 
                         bitmap.Save(filePathNameOutput);
 
-
-
                         Console.WriteLine($"Count of Pics: {countAllPics}");
                         Console.WriteLine($"Dubs Pic: {setOfDupsPic.Count} pics");
                         Console.WriteLine($"Associated with dups pics: {setComparedPic.Count}");
@@ -195,6 +193,8 @@ namespace ConsoleApp1
             {
                 Console.WriteLine(ex.Message);
             }
+
+            Console.ReadLine();
         }
 
         private static bool IsExist(List<Point> _listOfPoints, Point _point)
@@ -504,9 +504,7 @@ namespace ConsoleApp1
 
             standartDeviation = Math.Sqrt(numerator / (_bitmap.Width * _bitmap.Height));
 
-
             return medianBrightness;
         }
-
     }
 }
