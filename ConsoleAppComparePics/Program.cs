@@ -11,8 +11,8 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            //string filePathName = ConfigurationManager.AppSettings.Get("pathFileName");
-            //string filePathNameOutput = ConfigurationManager.AppSettings.Get("pathOutputFileName");
+            string filePathName = ConfigurationManager.AppSettings.Get("pathFileName");
+            string filePathNameOutput = ConfigurationManager.AppSettings.Get("pathOutputFileName");
 
             List<Point> coordinatesComparedPictures = new List<Point>();
 
@@ -24,6 +24,8 @@ namespace ConsoleApp1
             double precisionPercent = Convert.ToDouble(ConfigurationManager.AppSettings.Get("precision")) / 100;
 
             int proportionate = 0;
+
+            int switchAction = 0;
 
             Dictionary<Point, List<bool>> dictionaryPicHash = new Dictionary<Point, List<bool>>();
             Dictionary<Point, List<bool>> dictionaryPicHash90 = new Dictionary<Point, List<bool>>();
@@ -39,10 +41,10 @@ namespace ConsoleApp1
             HashSet<Point> setAllPic = new HashSet<Point>();
             HashSet<Point> setEmptyPic = new HashSet<Point>();
 
-            Console.Write("Please input path and file name original picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
-            string filePathName = Console.ReadLine();
-            Console.Write("Please input path and file name output picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
-            string filePathNameOutput = Console.ReadLine();
+            //Console.Write("Please input path and file name original picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
+            //string filePathName = Console.ReadLine();
+            //Console.Write("Please input path and file name output picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
+            //string filePathNameOutput = Console.ReadLine();
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -78,8 +80,8 @@ namespace ConsoleApp1
                             if (IsExist(listOfPointComparedPic, item.Key))
                                 continue;
 
-                            Random randomColor = new Random();
-                            Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
+                            //Random randomColor = new Random();
+                            //Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
 
                             foreach (KeyValuePair<Point, Size> subItem in dictionaryOfSizes)
                             {
@@ -104,7 +106,7 @@ namespace ConsoleApp1
                                             CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent ||
                                             CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent)
                                         {
-                                            AddPoinsToHashsetList(setOfDupsPic, setComparedPic, item.Key, subItem.Key, listOfPointComparedPic);
+                                            AddPointsToHashsetList(setOfDupsPic, setComparedPic, item.Key, subItem.Key, listOfPointComparedPic);
                                         }
                                     }
 
@@ -124,6 +126,13 @@ namespace ConsoleApp1
                         {
                             ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(0, 255, 0));
                         }
+
+                        foreach (var item in setComparedPic)
+                        {
+                            ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(255, 0, 0));
+                        }
+
+
 
                         if (File.Exists(filePathNameOutput))
                             File.Delete(filePathNameOutput);
@@ -180,7 +189,7 @@ namespace ConsoleApp1
             _list.Add(_point);
         }
 
-        private static void AddPoinsToHashsetList(HashSet<Point> hashSet1, HashSet<Point> hashSet2, Point point1, Point point2, List<Point> list)
+        private static void AddPointsToHashsetList(HashSet<Point> hashSet1, HashSet<Point> hashSet2, Point point1, Point point2, List<Point> list)
         {
             hashSet1.Add(point1);
             hashSet2.Add(point2);
