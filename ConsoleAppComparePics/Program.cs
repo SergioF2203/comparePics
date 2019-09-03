@@ -11,8 +11,8 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            string filePathName = ConfigurationManager.AppSettings.Get("pathFileName");
-            string filePathNameOutput = ConfigurationManager.AppSettings.Get("pathOutputFileName");
+            //string filePathName = ConfigurationManager.AppSettings.Get("pathFileName");
+            //string filePathNameOutput = ConfigurationManager.AppSettings.Get("pathOutputFileName");
 
             List<Point> coordinatesComparedPictures = new List<Point>();
 
@@ -32,6 +32,7 @@ namespace ConsoleApp1
             Dictionary<Point, List<bool>> dictionaryPicHash180 = new Dictionary<Point, List<bool>>();
             Dictionary<Point, List<bool>> dictionaryPicHash270 = new Dictionary<Point, List<bool>>();
             Dictionary<Point, List<bool>> dictionaryPicHashFlip = new Dictionary<Point, List<bool>>();
+            Dictionary<Point, List<bool>> dictionaryPicHashVFlip = new Dictionary<Point, List<bool>>();
 
             Dictionary<Point, Size> dictionaryOfSizes = new Dictionary<Point, Size>();
             List<Point> listOfPointComparedPic = new List<Point>();
@@ -41,10 +42,13 @@ namespace ConsoleApp1
             HashSet<Point> setAllPic = new HashSet<Point>();
             HashSet<Point> setEmptyPic = new HashSet<Point>();
 
-            //Console.Write("Please input path and file name original picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
-            //string filePathName = Console.ReadLine();
-            //Console.Write("Please input path and file name output picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
-            //string filePathNameOutput = Console.ReadLine();
+            HashSet<Point> setBorderedPictures = new HashSet<Point>();
+            HashSet<Point> setUnborderedPictures = new HashSet<Point>();
+
+            Console.Write("Please input path and file name original picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
+            string filePathName = Console.ReadLine();
+            Console.Write("Please input path and file name output picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
+            string filePathNameOutput = Console.ReadLine();
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -57,9 +61,9 @@ namespace ConsoleApp1
                     {
                         float precisionIndex = StandartDeviationBrightness(bitmap);
 
-                        for (int yComparePicture = 0; yComparePicture < bitmap.Height; yComparePicture += stepPicY)
+                        for (int yComparePicture = 0; yComparePicture + stepPicY <= bitmap.Height; yComparePicture += stepPicY)
                         {
-                            for (int xComparedPicture = 0; xComparedPicture < bitmap.Width; xComparedPicture += stepPicX)
+                            for (int xComparedPicture = 0; xComparedPicture + stepPicX <= bitmap.Width; xComparedPicture += stepPicX)
                             {
                                 Bitmap singlePicture = PurePicture(bitmap, xComparedPicture, yComparePicture, stepPicX, stepPicY);
 
@@ -70,6 +74,7 @@ namespace ConsoleApp1
                                 dictionaryPicHash180.Add(new Point(xComparedPicture, yComparePicture), GetWholeHash(singlePicture, 180));
                                 dictionaryPicHash270.Add(new Point(xComparedPicture, yComparePicture), GetWholeHash(singlePicture, 270));
                                 dictionaryPicHashFlip.Add(new Point(xComparedPicture, yComparePicture), GetWholeHash(singlePicture, 180180));
+                                dictionaryPicHashVFlip.Add(new Point(xComparedPicture, yComparePicture), GetWholeHash(singlePicture, 270270));
 
                                 dictionaryOfSizes.Add(new Point(xComparedPicture, yComparePicture), new Size(singlePicture.Width, singlePicture.Height));
                             }
@@ -104,7 +109,8 @@ namespace ConsoleApp1
                                             CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent ||
                                             CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent ||
                                             CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent ||
-                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent)
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent ||
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
                                         {
                                             AddPointsToHashsetList(setOfDupsPic, setComparedPic, item.Key, subItem.Key, listOfPointComparedPic);
                                         }
@@ -122,15 +128,39 @@ namespace ConsoleApp1
                         setAllPic.ExceptWith(setComparedPic);
                         int countUniquePic = setAllPic.Count;
 
+                        //for (int yComparePicture = 0; yComparePicture + stepPicY <= bitmap.Height; yComparePicture += stepPicY)
+                        //{
+                        //    for (int xComparePicture = 0; xComparePicture + stepPicX <= bitmap.Width; xComparePicture += stepPicX)
+                        //    {
+                        //        if (bitmap.GetPixel(xComparePicture, yComparePicture).R == 0 &&
+                        //            bitmap.GetPixel(xComparePicture, yComparePicture).G == 255 &&
+                        //            bitmap.GetPixel(xComparePicture, yComparePicture).B == 0)
+                        //        {
+                        //            setBorderedPictures.Add(new Point(xComparePicture, yComparePicture));
+                        //        }
+                        //        else
+                        //        {
+                        //            setUnborderedPictures.Add(new Point(xComparePicture, yComparePicture));
+                        //        }
+                        //    }
+                        //}
+
+                        //foreach (var item in setUnborderedPictures)
+                        //{
+                        //    Console.WriteLine(item);
+                        //}
+
                         foreach (var item in setAllPic)
                         {
                             ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(0, 255, 0));
                         }
 
-                        foreach (var item in setComparedPic)
-                        {
-                            ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(255, 0, 0));
-                        }
+                        //foreach (var item in setUnborderedPictures)
+                        //{
+                        //    ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(255, 0, 0));
+                        //}
+
+                        //bitmap.MakeTransparent(Color.FromArgb(0, 255, 0));
 
 
 
@@ -162,6 +192,8 @@ namespace ConsoleApp1
 
             Console.ReadLine();
         }
+
+
 
         private static bool IsExist(List<Point> _listOfPoints, Point _point)
         {
@@ -256,6 +288,18 @@ namespace ConsoleApp1
                     for (int y = 0; y < _bitmap.Height; y++)
                     {
                         for (int x = _bitmap.Width - 1; x >= 0; x--)
+                        {
+                            if (_bitmap.GetPixel(x, y).GetBrightness() != 0)
+                                listOfResults.Add(true);
+                            else
+                                listOfResults.Add(false);
+                        }
+                    }
+                    break;
+                case 270270:
+                    for(int y = _bitmap.Height-1; y>=0; y--)
+                    {
+                        for(int x = 0; x<_bitmap.Width; x++)
                         {
                             if (_bitmap.GetPixel(x, y).GetBrightness() != 0)
                                 listOfResults.Add(true);
