@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 
@@ -11,8 +12,9 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            //string filePathName = ConfigurationManager.AppSettings.Get("pathFileName");
-            //string filePathNameOutput = ConfigurationManager.AppSettings.Get("pathOutputFileName");
+            string filePathName = ConfigurationManager.AppSettings.Get("pathFileName");
+            string filePathNameOutput = ConfigurationManager.AppSettings.Get("pathOutputFileName");
+            string fileColoredPathName = ConfigurationManager.AppSettings.Get("pathColoredFileName");
 
             List<Point> coordinatesComparedPictures = new List<Point>();
 
@@ -34,6 +36,8 @@ namespace ConsoleApp1
             Dictionary<Point, List<bool>> dictionaryPicHashFlip = new Dictionary<Point, List<bool>>();
             Dictionary<Point, List<bool>> dictionaryPicHashVFlip = new Dictionary<Point, List<bool>>();
 
+            Dictionary<Point, Bitmap> dictionaryUniquePics = new Dictionary<Point, Bitmap>();
+
             Dictionary<Point, Size> dictionaryOfSizes = new Dictionary<Point, Size>();
             List<Point> listOfPointComparedPic = new List<Point>();
 
@@ -45,18 +49,23 @@ namespace ConsoleApp1
             HashSet<Point> setBorderedPictures = new HashSet<Point>();
             HashSet<Point> setUnborderedPictures = new HashSet<Point>();
 
-            Console.Write("Please input path and file name original picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
-            string filePathName = Console.ReadLine();
-            Console.Write("Please input path and file name output picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
-            string filePathNameOutput = Console.ReadLine();
+            //Console.Write("Please input path and file name original picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
+            //string filePathName = Console.ReadLine();
+            //Console.Write("Please input path and file name output picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
+            //string filePathNameOutput = Console.ReadLine();
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
+
+
 
             try
             {
                 using (Bitmap picfile = new Bitmap(filePathName))
                 {
                     Bitmap bitmap = new Bitmap(picfile);
+                    Bitmap coloredBmp = new Bitmap(fileColoredPathName);
+                    Bitmap coloredBitmap = new Bitmap(coloredBmp);
+
                     if (IsImage(bitmap))
                     {
                         float precisionIndex = StandartDeviationBrightness(bitmap);
@@ -85,9 +94,6 @@ namespace ConsoleApp1
                             if (IsExist(listOfPointComparedPic, item.Key))
                                 continue;
 
-                            //Random randomColor = new Random();
-                            //Color color = Color.FromArgb(randomColor.Next(256), randomColor.Next(256), randomColor.Next(256));
-
                             foreach (KeyValuePair<Point, Size> subItem in dictionaryOfSizes)
                             {
                                 if (subItem.Key == item.Key)
@@ -105,14 +111,30 @@ namespace ConsoleApp1
                                 {
                                     if (proportionate != 0)
                                     {
-                                        if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent ||
-                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent ||
-                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent ||
-                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent ||
-                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent ||
-                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
+                                        //********************* case block *******************//
+
+                                        //if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent ||
+                                        //    CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent ||
+                                        //    CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent ||
+                                        //    CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent ||
+                                        //    CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent ||
+                                        //    CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
+                                        //{
+                                        //    AddPointsToHashsetList(setOfDupsPic, setComparedPic, item.Key, subItem.Key, listOfPointComparedPic);
+                                        //}
+
+                                        if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent)
                                         {
-                                            AddPointsToHashsetList(setOfDupsPic, setComparedPic, item.Key, subItem.Key, listOfPointComparedPic);
+                                            Bitmap copyFromBitmap = WholePicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY);
+                                            using(Graphics grD = Graphics.FromImage(coloredBitmap))
+                                            {
+                                                GraphicsPath graphicsPath = new GraphicsPath();
+                                                graphicsPath.AddRectangle(new Rectangle(subItem.Key.X, subItem.Key.Y, stepPicX, stepPicY));
+                                                grD.SetClip(graphicsPath);
+                                                grD.Clear(Color.Transparent);
+                                                grD.ResetClip();
+                                                grD.DrawImage(copyFromBitmap, subItem.Key.X, subItem.Key.Y);
+                                            }
                                         }
                                     }
 
@@ -127,6 +149,12 @@ namespace ConsoleApp1
 
                         setAllPic.ExceptWith(setComparedPic);
                         int countUniquePic = setAllPic.Count;
+
+
+                        foreach (var item in setAllPic)
+                        {
+                            dictionaryUniquePics.Add(new Point(item.X, item.Y), WholePicture(bitmap, item.X, item.Y, stepPicX, stepPicY));
+                        }
 
                         //for (int yComparePicture = 0; yComparePicture + stepPicY <= bitmap.Height; yComparePicture += stepPicY)
                         //{
@@ -150,10 +178,14 @@ namespace ConsoleApp1
                         //    Console.WriteLine(item);
                         //}
 
-                        foreach (var item in setAllPic)
-                        {
-                            ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(0, 255, 0));
-                        }
+
+
+                        //foreach (var item in setAllPic)
+                        //{
+                        //    ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(0, 255, 0));
+                        //}
+
+
 
                         //foreach (var item in setUnborderedPictures)
                         //{
@@ -167,7 +199,8 @@ namespace ConsoleApp1
                         if (File.Exists(filePathNameOutput))
                             File.Delete(filePathNameOutput);
 
-                        bitmap.Save(filePathNameOutput);
+                        //bitmap.Save(filePathNameOutput);
+                        coloredBitmap.Save(filePathNameOutput);
 
                         Console.WriteLine($"Count of Pics: {countAllPics}");
                         Console.WriteLine($"Dubs Pic: {setOfDupsPic.Count} pics");
@@ -297,9 +330,9 @@ namespace ConsoleApp1
                     }
                     break;
                 case 270270:
-                    for(int y = _bitmap.Height-1; y>=0; y--)
+                    for (int y = _bitmap.Height - 1; y >= 0; y--)
                     {
-                        for(int x = 0; x<_bitmap.Width; x++)
+                        for (int x = 0; x < _bitmap.Width; x++)
                         {
                             if (_bitmap.GetPixel(x, y).GetBrightness() != 0)
                                 listOfResults.Add(true);
