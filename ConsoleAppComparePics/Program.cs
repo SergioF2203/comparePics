@@ -446,6 +446,18 @@ namespace ConsoleApp1
             return purePicure;
         }
 
+        private static Bitmap WholePicture(Bitmap _bitmap, int _xCoordinate, int _yCoordinate, int _stepPicX, int _stepPicY)
+        {
+            Rectangle cloneRect = new Rectangle(_xCoordinate, _yCoordinate, _stepPicX, _stepPicY);
+
+            System.Drawing.Imaging.PixelFormat format = _bitmap.PixelFormat;
+
+            Bitmap wholePicure = _bitmap.Clone(cloneRect, format);
+
+            return wholePicure;
+        }
+
+
         private static int ComparsionOnlyHash(List<bool> hash1, List<bool> hash2)
         {
             return hash1.Zip(hash2, (i, j) => i == j).Count(eq => eq);
