@@ -125,16 +125,11 @@ namespace ConsoleApp1
 
                                         if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent)
                                         {
-                                            Bitmap copyFromBitmap = WholePicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY);
-                                            using(Graphics grD = Graphics.FromImage(coloredBitmap))
-                                            {
-                                                GraphicsPath graphicsPath = new GraphicsPath();
-                                                graphicsPath.AddRectangle(new Rectangle(subItem.Key.X, subItem.Key.Y, stepPicX, stepPicY));
-                                                grD.SetClip(graphicsPath);
-                                                grD.Clear(Color.Transparent);
-                                                grD.ResetClip();
-                                                grD.DrawImage(copyFromBitmap, subItem.Key.X, subItem.Key.Y);
-                                            }
+                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate90FlipNone);
+                                        }
+                                        else if(CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent)
+                                        {
+
                                         }
                                     }
 
@@ -153,7 +148,7 @@ namespace ConsoleApp1
 
                         foreach (var item in setAllPic)
                         {
-                            dictionaryUniquePics.Add(new Point(item.X, item.Y), WholePicture(bitmap, item.X, item.Y, stepPicX, stepPicY));
+
                         }
 
                         //for (int yComparePicture = 0; yComparePicture + stepPicY <= bitmap.Height; yComparePicture += stepPicY)
@@ -226,7 +221,22 @@ namespace ConsoleApp1
             Console.ReadLine();
         }
 
+        private static void TransformPicture(Bitmap _bitmapSource, int _xSource, int _ySource, int _width, int _height, int _xDist, int _yDist, RotateFlipType rotateFlipType)
+        {
+            Bitmap copyFromBitmap = WholePicture(_bitmapSource, _xSource, _ySource, _width, _height);
+            using (Graphics grD = Graphics.FromImage(_bitmapSource))
+            {
+                GraphicsPath graphicsPath = new GraphicsPath();
+                graphicsPath.AddRectangle(new Rectangle(_xDist, _yDist, _width, _height));
+                grD.SetClip(graphicsPath);
+                grD.Clear(Color.Transparent);
+                grD.ResetClip();
 
+                copyFromBitmap.RotateFlip(rotateFlipType);
+
+                grD.DrawImage(copyFromBitmap, _xDist, _yDist);
+            }
+        }
 
         private static bool IsExist(List<Point> _listOfPoints, Point _point)
         {
