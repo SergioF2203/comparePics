@@ -12,9 +12,9 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            string filePathName = ConfigurationManager.AppSettings.Get("pathFileName");
-            string filePathNameOutput = ConfigurationManager.AppSettings.Get("pathOutputFileName");
-            string fileColoredPathName = ConfigurationManager.AppSettings.Get("pathColoredFileName");
+            //string filePathName = ConfigurationManager.AppSettings.Get("pathFileName");
+            //string filePathNameOutput = ConfigurationManager.AppSettings.Get("pathOutputFileName");
+            //string fileColoredPathName = ConfigurationManager.AppSettings.Get("pathColoredFileName");
 
             List<Point> coordinatesComparedPictures = new List<Point>();
 
@@ -47,25 +47,41 @@ namespace ConsoleApp1
             HashSet<Point> setBorderedPictures = new HashSet<Point>();
             HashSet<Point> setUnborderedPictures = new HashSet<Point>();
 
-            //Console.Write("Please input path and file name original picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
-            //string filePathName = Console.ReadLine();
-            //Console.Write("Please input path and file name output picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
-            //string filePathNameOutput = Console.ReadLine();
+            string filePathName = "";
+            string filePathNameOutput = "";
+            string fileColoredPathName = "";
+
+            Console.Write("What stage do you need? (1 - to detect unique pics stage, 2 - colored dups from unique pics stage): ");
+            int choiseOfStage = int.Parse(Console.ReadLine());
+
+            Console.Write("Please input path and file name original picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
+            filePathName = Console.ReadLine();
+
+            switch (choiseOfStage)
+            {
+                case 1:
+                    Console.Write("Please input path and file name output picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
+                    filePathNameOutput = Console.ReadLine();
+                    break;
+                case 2:
+                    Console.Write("Please input path and file name colored picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
+                    fileColoredPathName = Console.ReadLine();
+
+                    Console.Write("Please input path and file name output picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
+                    filePathNameOutput = Console.ReadLine();
+                    break;
+                default:
+                    break;
+            }
+
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
-
-
 
             try
             {
                 using (Bitmap picfile = new Bitmap(filePathName))
                 {
                     Bitmap bitmap = new Bitmap(picfile);
-                    Bitmap coloredBmp = new Bitmap(fileColoredPathName);
-                    Bitmap coloredBitmap = new Bitmap(coloredBmp);
-
-                    coloredBitmap.MakeTransparent(Color.FromArgb(0, 255, 0));
-
 
                     if (IsImage(bitmap))
                     {
@@ -112,8 +128,6 @@ namespace ConsoleApp1
                                 {
                                     if (proportionate != 0)
                                     {
-                                        //********************* case block *******************//
-
                                         if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent ||
                                             CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent ||
                                             CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent ||
@@ -123,31 +137,6 @@ namespace ConsoleApp1
                                         {
                                             AddPointsToHashsetList(setOfDupsPic, setComparedPic, item.Key, subItem.Key, listOfPointComparedPic);
                                         }
-
-                                        //if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent)
-                                        //{
-                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipXY);
-                                        //}
-                                        //else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent)
-                                        //{
-                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate90FlipNone);
-                                        //}
-                                        //else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent)
-                                        //{
-                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipNone);
-                                        //}
-                                        //else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent)
-                                        //{
-                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate270FlipNone);
-                                        //}
-                                        //else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent)
-                                        //{
-                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipX);
-                                        //}
-                                        //else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
-                                        //{
-                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipY);
-                                        //}
                                     }
                                 }
                                 else
@@ -161,57 +150,65 @@ namespace ConsoleApp1
                         setAllPic.ExceptWith(setComparedPic);
                         int countUniquePic = setAllPic.Count;
 
-
-                        //foreach (var item in setAllPic)
-                        //{
-                        //    ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(0, 255, 0));
-                        //}
-
-                        foreach (var item in setAllPic)
+                        switch (choiseOfStage)
                         {
-                            foreach (var subItem in dictionaryOfSizes)
-                            {
-                                if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash[subItem.Key]) > precisionPercent)
+                            case 1:
+                                foreach (var item in setAllPic)
                                 {
-                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipXY);
+                                    ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(0, 255, 0));
                                 }
-                                else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash90[subItem.Key]) > precisionPercent)
+
+                                if (File.Exists(filePathNameOutput))
+                                    File.Delete(filePathNameOutput);
+
+                                bitmap.Save(filePathNameOutput);
+
+                                break;
+                            case 2:
+                                Bitmap coloredBmp = new Bitmap(fileColoredPathName);
+                                Bitmap coloredBitmap = new Bitmap(coloredBmp);
+
+                                coloredBitmap.MakeTransparent(Color.FromArgb(0, 255, 0));
+
+                                foreach (var item in setAllPic)
                                 {
-                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate90FlipNone);
+                                    foreach (var subItem in dictionaryOfSizes)
+                                    {
+                                        if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash[subItem.Key]) > precisionPercent)
+                                        {
+                                            TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipXY);
+                                        }
+                                        else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash90[subItem.Key]) > precisionPercent)
+                                        {
+                                            TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate90FlipNone);
+                                        }
+                                        else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash180[subItem.Key]) > precisionPercent)
+                                        {
+                                            TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipNone);
+                                        }
+                                        else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash270[subItem.Key]) > precisionPercent)
+                                        {
+                                            TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate270FlipNone);
+                                        }
+                                        else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHashFlip[subItem.Key]) > precisionPercent)
+                                        {
+                                            TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipX);
+                                        }
+                                        else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
+                                        {
+                                            TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipY);
+                                        }
+                                    }
                                 }
-                                else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash180[subItem.Key]) > precisionPercent)
-                                {
-                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipNone);
-                                }
-                                else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash270[subItem.Key]) > precisionPercent)
-                                {
-                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate270FlipNone);
-                                }
-                                else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHashFlip[subItem.Key]) > precisionPercent)
-                                {
-                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipX);
-                                }
-                                else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
-                                {
-                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipY);
-                                }
-                            }
+
+                                if (File.Exists(filePathNameOutput))
+                                    File.Delete(filePathNameOutput);
+
+                                coloredBitmap.Save(filePathNameOutput);
+                                break;
+                            default:
+                                break;
                         }
-
-
-                        //foreach (var item in setUnborderedPictures)
-                        //{
-                        //    ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(255, 0, 0));
-                        //}
-
-
-
-
-                        if (File.Exists(filePathNameOutput))
-                            File.Delete(filePathNameOutput);
-
-                        //bitmap.Save(filePathNameOutput);
-                        coloredBitmap.Save(filePathNameOutput);
 
                         Console.WriteLine($"Count of Pics: {countAllPics}");
                         Console.WriteLine($"Dubs Pic: {setOfDupsPic.Count} pics");
