@@ -64,6 +64,9 @@ namespace ConsoleApp1
                     Bitmap coloredBmp = new Bitmap(fileColoredPathName);
                     Bitmap coloredBitmap = new Bitmap(coloredBmp);
 
+                    coloredBitmap.MakeTransparent(Color.FromArgb(0, 255, 0));
+
+
                     if (IsImage(bitmap))
                     {
                         float precisionIndex = StandartDeviationBrightness(bitmap);
@@ -111,42 +114,41 @@ namespace ConsoleApp1
                                     {
                                         //********************* case block *******************//
 
-                                        //if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent ||
-                                        //    CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent ||
-                                        //    CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent ||
-                                        //    CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent ||
-                                        //    CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent ||
-                                        //    CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
+                                        if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent ||
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent ||
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent ||
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent ||
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent ||
+                                            CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
+                                        {
+                                            AddPointsToHashsetList(setOfDupsPic, setComparedPic, item.Key, subItem.Key, listOfPointComparedPic);
+                                        }
+
+                                        //if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent)
                                         //{
-                                        //    AddPointsToHashsetList(setOfDupsPic, setComparedPic, item.Key, subItem.Key, listOfPointComparedPic);
+                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipXY);
                                         //}
-
-                                        if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent)
-                                        {
-                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipXY);
-                                        }
-                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent)
-                                        {
-                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate90FlipNone);
-                                        }
-                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent)
-                                        {
-                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipNone);
-                                        }
-                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent)
-                                        {
-                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate270FlipNone);
-                                        }
-                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent)
-                                        {
-                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipX);
-                                        }
-                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
-                                        {
-                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipY);
-                                        }
+                                        //else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent)
+                                        //{
+                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate90FlipNone);
+                                        //}
+                                        //else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent)
+                                        //{
+                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipNone);
+                                        //}
+                                        //else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent)
+                                        //{
+                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate270FlipNone);
+                                        //}
+                                        //else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent)
+                                        //{
+                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipX);
+                                        //}
+                                        //else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
+                                        //{
+                                        //    TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipY);
+                                        //}
                                     }
-
                                 }
                                 else
                                     setEmptyPic.Add(subItem.Key);
@@ -165,6 +167,36 @@ namespace ConsoleApp1
                         //    ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(0, 255, 0));
                         //}
 
+                        foreach (var item in setAllPic)
+                        {
+                            foreach (var subItem in dictionaryOfSizes)
+                            {
+                                if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash[subItem.Key]) > precisionPercent)
+                                {
+                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipXY);
+                                }
+                                else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash90[subItem.Key]) > precisionPercent)
+                                {
+                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate90FlipNone);
+                                }
+                                else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash180[subItem.Key]) > precisionPercent)
+                                {
+                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipNone);
+                                }
+                                else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHash270[subItem.Key]) > precisionPercent)
+                                {
+                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate270FlipNone);
+                                }
+                                else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHashFlip[subItem.Key]) > precisionPercent)
+                                {
+                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipX);
+                                }
+                                else if (CompareHashs(dictionaryPicHash[item], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
+                                {
+                                    TransformPicture(coloredBitmap, item.X, item.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipY);
+                                }
+                            }
+                        }
 
 
                         //foreach (var item in setUnborderedPictures)
@@ -172,7 +204,6 @@ namespace ConsoleApp1
                         //    ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(255, 0, 0));
                         //}
 
-                        //bitmap.MakeTransparent(Color.FromArgb(0, 255, 0));
 
 
 
