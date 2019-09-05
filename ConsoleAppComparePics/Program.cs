@@ -27,8 +27,6 @@ namespace ConsoleApp1
 
             int proportionate = 0;
 
-            int switchAction = 0;
-
             Dictionary<Point, List<bool>> dictionaryPicHash = new Dictionary<Point, List<bool>>();
             Dictionary<Point, List<bool>> dictionaryPicHash90 = new Dictionary<Point, List<bool>>();
             Dictionary<Point, List<bool>> dictionaryPicHash180 = new Dictionary<Point, List<bool>>();
@@ -70,9 +68,9 @@ namespace ConsoleApp1
                     {
                         float precisionIndex = StandartDeviationBrightness(bitmap);
 
-                        for (int yComparePicture = 0; yComparePicture + stepPicY <= bitmap.Height; yComparePicture += stepPicY)
+                        for (int yComparePicture = 0; yComparePicture < bitmap.Height; yComparePicture += stepPicY)
                         {
-                            for (int xComparedPicture = 0; xComparedPicture + stepPicX <= bitmap.Width; xComparedPicture += stepPicX)
+                            for (int xComparedPicture = 0; xComparedPicture < bitmap.Width; xComparedPicture += stepPicX)
                             {
                                 Bitmap singlePicture = PurePicture(bitmap, xComparedPicture, yComparePicture, stepPicX, stepPicY);
 
@@ -125,11 +123,27 @@ namespace ConsoleApp1
 
                                         if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash[subItem.Key]) > precisionPercent)
                                         {
+                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipXY);
+                                        }
+                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent)
+                                        {
                                             TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate90FlipNone);
                                         }
-                                        else if(CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash90[subItem.Key]) > precisionPercent)
+                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash180[subItem.Key]) > precisionPercent)
                                         {
-
+                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate180FlipNone);
+                                        }
+                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHash270[subItem.Key]) > precisionPercent)
+                                        {
+                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.Rotate270FlipNone);
+                                        }
+                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashFlip[subItem.Key]) > precisionPercent)
+                                        {
+                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipX);
+                                        }
+                                        else if (CompareHashs(dictionaryPicHash[item.Key], dictionaryPicHashVFlip[subItem.Key]) > precisionPercent)
+                                        {
+                                            TransformPicture(coloredBitmap, item.Key.X, item.Key.Y, stepPicX, stepPicY, subItem.Key.X, subItem.Key.Y, RotateFlipType.RotateNoneFlipY);
                                         }
                                     }
 
@@ -144,35 +158,6 @@ namespace ConsoleApp1
 
                         setAllPic.ExceptWith(setComparedPic);
                         int countUniquePic = setAllPic.Count;
-
-
-                        foreach (var item in setAllPic)
-                        {
-
-                        }
-
-                        //for (int yComparePicture = 0; yComparePicture + stepPicY <= bitmap.Height; yComparePicture += stepPicY)
-                        //{
-                        //    for (int xComparePicture = 0; xComparePicture + stepPicX <= bitmap.Width; xComparePicture += stepPicX)
-                        //    {
-                        //        if (bitmap.GetPixel(xComparePicture, yComparePicture).R == 0 &&
-                        //            bitmap.GetPixel(xComparePicture, yComparePicture).G == 255 &&
-                        //            bitmap.GetPixel(xComparePicture, yComparePicture).B == 0)
-                        //        {
-                        //            setBorderedPictures.Add(new Point(xComparePicture, yComparePicture));
-                        //        }
-                        //        else
-                        //        {
-                        //            setUnborderedPictures.Add(new Point(xComparePicture, yComparePicture));
-                        //        }
-                        //    }
-                        //}
-
-                        //foreach (var item in setUnborderedPictures)
-                        //{
-                        //    Console.WriteLine(item);
-                        //}
-
 
 
                         //foreach (var item in setAllPic)
@@ -219,6 +204,16 @@ namespace ConsoleApp1
             }
 
             Console.ReadLine();
+        }
+
+        private static Bitmap WholePicture(Bitmap _bitmap, int _xCoordinate, int _yCoordinate, int _stepPicX, int _stepPicY)
+        {
+            Rectangle cloneRect = new Rectangle(_xCoordinate, _yCoordinate, _stepPicX, _stepPicY);
+            System.Drawing.Imaging.PixelFormat format = _bitmap.PixelFormat;
+
+            Bitmap wholePicure = _bitmap.Clone(cloneRect, format);
+
+            return wholePicure;
         }
 
         private static void TransformPicture(Bitmap _bitmapSource, int _xSource, int _ySource, int _width, int _height, int _xDist, int _yDist, RotateFlipType rotateFlipType)
@@ -489,16 +484,6 @@ namespace ConsoleApp1
             return purePicure;
         }
 
-        private static Bitmap WholePicture(Bitmap _bitmap, int _xCoordinate, int _yCoordinate, int _stepPicX, int _stepPicY)
-        {
-            Rectangle cloneRect = new Rectangle(_xCoordinate, _yCoordinate, _stepPicX, _stepPicY);
-
-            System.Drawing.Imaging.PixelFormat format = _bitmap.PixelFormat;
-
-            Bitmap wholePicure = _bitmap.Clone(cloneRect, format);
-
-            return wholePicure;
-        }
 
 
         private static int ComparsionOnlyHash(List<bool> hash1, List<bool> hash2)
