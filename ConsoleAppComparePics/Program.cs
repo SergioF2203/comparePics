@@ -155,7 +155,11 @@ namespace ConsoleApp1
                             case 1:
                                 foreach (var item in setAllPic)
                                 {
-                                    ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(0, 255, 0));
+                                    //ColoredDublicate(bitmap, item.X, item.Y, stepPicX, Color.FromArgb(0, 255, 0));
+
+                                    Brush brush = new SolidBrush(Color.FromArgb(0, 255, 0));
+                                    ColoredDublicateMarkCorner(bitmap, item.X, item.Y, brush);
+
                                 }
 
                                 if (File.Exists(filePathNameOutput))
@@ -415,6 +419,26 @@ namespace ConsoleApp1
                 bitmap.SetPixel(leftUpperCornerX + 2, i + leftUpperCornerY - leftUpperCornerX, color);
                 bitmap.SetPixel(leftUpperCornerX + 3, i + leftUpperCornerY - leftUpperCornerX, color);
             }
+        }
+
+        private static void ColoredDublicateMarkCorner(Bitmap bitmap, int leftUpperCornerX, int leftUpperCornerY, Brush brush)
+        {
+            Point [] points = new Point[3];
+
+            points[0].X = leftUpperCornerX;
+            points[0].Y = leftUpperCornerY;
+
+            points[1].X = leftUpperCornerX + 10;
+            points[1].Y = leftUpperCornerY;
+
+            points[2].X = leftUpperCornerX;
+            points[2].Y = leftUpperCornerY + 10;
+
+            using(Graphics graphics = Graphics.FromImage(bitmap))
+            {
+                graphics.FillPolygon(brush, points);
+            }
+
         }
 
         private static Rectangle ImageRectangle(Bitmap _bitmap)
