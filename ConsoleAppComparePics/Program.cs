@@ -50,9 +50,17 @@ namespace ConsoleApp1
             string filePathName = "";
             string filePathNameOutput = "";
             string fileColoredPathName = "";
-
+            int choiseOfStage = 0;
+            try
+            {
             Console.Write("What stage do you need? (1 - to detect unique pics stage, 2 - colored dups from unique pics stage): ");
-            int choiseOfStage = int.Parse(Console.ReadLine());
+            choiseOfStage = int.Parse(Console.ReadLine());
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                System.Environment.Exit(0);
+            }
 
             Console.Write("Please input path and file name original picture (i.e. diskName:\\folder\\folder\\...\\picName.png): ");
             filePathName = Console.ReadLine();
@@ -85,6 +93,16 @@ namespace ConsoleApp1
 
                     if (IsImage(bitmap))
                     {
+                        //check size of image and crop
+                        if (bitmap.Height % stepPicY != 0 || bitmap.Width % stepPicX != 0)
+                        {
+                            Console.WriteLine(Math.Abs(bitmap.Height / stepPicY) * stepPicY);
+                            Console.WriteLine(Math.Abs(bitmap.Width / stepPicX) * stepPicX);
+
+                            Console.ReadLine();
+                        }
+                        //
+
                         float precisionIndex = StandartDeviationBrightness(bitmap);
 
                         for (int yComparePicture = 0; yComparePicture < bitmap.Height; yComparePicture += stepPicY)
@@ -423,7 +441,7 @@ namespace ConsoleApp1
 
         private static void ColoredDublicateMarkCorner(Bitmap bitmap, int leftUpperCornerX, int leftUpperCornerY, Brush brush)
         {
-            Point [] points = new Point[3];
+            Point[] points = new Point[3];
 
             points[0].X = leftUpperCornerX;
             points[0].Y = leftUpperCornerY;
@@ -434,7 +452,7 @@ namespace ConsoleApp1
             points[2].X = leftUpperCornerX;
             points[2].Y = leftUpperCornerY + 10;
 
-            using(Graphics graphics = Graphics.FromImage(bitmap))
+            using (Graphics graphics = Graphics.FromImage(bitmap))
             {
                 graphics.FillPolygon(brush, points);
             }
