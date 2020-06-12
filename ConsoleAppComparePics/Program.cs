@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace ConsoleApp1
 {
@@ -96,12 +97,28 @@ namespace ConsoleApp1
                         //check size of image and crop
                         if (bitmap.Height % stepPicY != 0 || bitmap.Width % stepPicX != 0)
                         {
-                            Console.WriteLine(Math.Abs(bitmap.Height / stepPicY) * stepPicY);
-                            Console.WriteLine(Math.Abs(bitmap.Width / stepPicX) * stepPicX);
+                            Console.Write("The Image has invalid size, do you want to crop it? (Y/N): ");
+                            var choise = Console.ReadLine();
+                            switch (choise)
+                            {
+                                case "Y":
+                                case "y":
+                                    bitmap = Extensions.Crop(bitmap, new Rectangle(0, 0, Math.Abs(bitmap.Width / stepPicX) * stepPicX, Math.Abs(bitmap.Height / stepPicY) * stepPicY));
+                                    Console.WriteLine($"new Picture Width: {Math.Abs(bitmap.Width / stepPicX) * stepPicX}");
+                                    Console.WriteLine($"new Picture Height: {Math.Abs(bitmap.Height / stepPicY) * stepPicY}");
 
-                            Console.ReadLine();
+                                    break;
+                                case "N":
+                                case "n":
+                                    throw new Exception("Invalid a picture size");
+                                default:
+                                    break;
+                            }
+                            //Console.WriteLine(Math.Abs(bitmap.Height / stepPicY) * stepPicY);
+                            //Console.WriteLine(Math.Abs(bitmap.Width / stepPicX) * stepPicX);
+
+                            //Console.ReadLine();
                         }
-                        //
 
                         float precisionIndex = StandartDeviationBrightness(bitmap);
 
@@ -255,6 +272,7 @@ namespace ConsoleApp1
 
             Console.ReadLine();
         }
+
 
         private static Bitmap WholePicture(Bitmap _bitmap, int _xCoordinate, int _yCoordinate, int _stepPicX, int _stepPicY)
         {
@@ -553,8 +571,6 @@ namespace ConsoleApp1
 
             return purePicure;
         }
-
-
 
         private static int ComparsionOnlyHash(List<bool> hash1, List<bool> hash2)
         {
